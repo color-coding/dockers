@@ -1,0 +1,15 @@
+# 基于官方nginx镜像添加工具
+FROM nginx
+
+# 作者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+RUN set -x \
+    && apt-get update \
+# 安装wget
+    && apt-get install -y wget \
+# 安装unzip
+    && apt-get install -y unzip \
+# 删除更新列表
+    && rm -rf /var/lib/apt/lists/*
+
