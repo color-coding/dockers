@@ -1,0 +1,53 @@
+# 基于官方jre镜像
+FROM java:jre
+
+# 作者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+# nexus版本及下载地址
+ARG NEXUS_VERSION=3.2.0-01
+ARG NEXUS_NAME=nexus-${NEXUS_VERSION}
+ARG NEXUS_PACKAGE=${NEXUS_NAME}-unix.tar.gz
+ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/${NEXUS_PACKAGE}
+
+# 安装工具
+RUN set -x \
+    && apt-get update \
+# 安装curl
+    && apt-get install -y curl \
+# 删除更新列表
+    && rm -rf /var/lib/apt/lists/*
+
+# 运行环境
+ENV SONATYPE_DIR=/opt/sonatype
+ENV NEXUS_HOME=${SONATYPE_DIR}/nexus \
+    NEXUS_DATA=/nexus-data \
+    NEXUS_CONTEXT='' \
+    SONATYPE_WORK=${SONATYPE_DIR}/sonatype-work
+
+RUN mkdir -p ${NEXUS_HOME}
+WORKDIR ${NEXUS_HOME}
+
+# 安装nexus
+mkdir curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} \
+      | gunzip \
+      | tar x -C ${NEXUS_HOME} --strip-components=1 ${NEXUS_NAME} \
+      && chown -R root:root ${NEXUS_HOME}
+
+# 配置nexus
+RUN sed \
+    -e '/^nexus-context/ s:$:${NEXUS_CONTEXT}:' \
+    -i ${NEXUS_HOME}/etc/nexus-default.properties
+    
+# 创建用户
+RUN useradd -r -u 200 -m -c "nexus role account" -d ${NEXUS_DATA} -s /bin/false nexus \
+    && mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
+    && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3 \
+    && chown -R nexus:nexus ${NEXUS_DATA}
+
+VOLUME ${NEXUS_DATA}
+
+EXPOSE 8877
+USER nexus
+
+CMD ["bin/nexus", "run"]
