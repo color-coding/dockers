@@ -29,7 +29,7 @@ RUN mkdir -p ${NEXUS_HOME}
 WORKDIR ${NEXUS_HOME}
 
 # 安装nexus
-mkdir curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} \
+RUN curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} \
       | gunzip \
       | tar x -C ${NEXUS_HOME} --strip-components=1 ${NEXUS_NAME} \
       && chown -R root:root ${NEXUS_HOME}
