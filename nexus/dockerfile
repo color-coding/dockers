@@ -6,9 +6,7 @@ MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
 
 # nexus版本及下载地址
 ARG NEXUS_VERSION=3.2.0-01
-ARG NEXUS_NAME=nexus-${NEXUS_VERSION}
-ARG NEXUS_PACKAGE=${NEXUS_NAME}-unix.tar.gz
-ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/${NEXUS_PACKAGE}
+ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz
 
 # 安装工具
 RUN set -x \
@@ -29,9 +27,9 @@ RUN mkdir -p ${NEXUS_HOME}
 WORKDIR ${NEXUS_HOME}
 
 # 安装nexus
-mkdir curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} \
+RUN curl --fail --silent --location --retry 3 ${NEXUS_DOWNLOAD_URL} \
       | gunzip \
-      | tar x -C ${NEXUS_HOME} --strip-components=1 ${NEXUS_NAME} \
+      | tar x -C ${NEXUS_HOME} --strip-components=1 nexus-${NEXUS_VERSION} \
       && chown -R root:root ${NEXUS_HOME}
 
 # 配置nexus
