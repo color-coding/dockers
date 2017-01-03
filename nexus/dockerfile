@@ -1,5 +1,5 @@
 # 基于官方jre镜像
-FROM java:jre
+FROM openjdk:jre
 
 # 作者
 MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
