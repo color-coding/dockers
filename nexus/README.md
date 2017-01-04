@@ -97,7 +97,8 @@ additional information.
   2. *Mount a host directory as the volume*.  This is not portable, as it
   relies on the directory existing with correct permissions on the host.
   However it can be useful in certain situations where this volume needs
-  to be assigned to certain underlying storage.  
+  to be assigned to certain underlying storage. 
+  need to close selinux, edit /etc/selinux/config and change [SELINUX=enforcing] to [SELINUX=disabled].
 
   ```
   $ mkdir /some/dir/nexus-data && chown -R 200 /some/dir/nexus-data
