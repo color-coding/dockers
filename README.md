@@ -2,8 +2,8 @@
 发布的docker镜像的docker file
 
 ### 鼓励师 | encourager
-[![encourager]](https://github.com/color-coding/dockers/blob/master/encourager.gif)  
-[encourager]:https://github.com/color-coding/dockers/blob/master/encourager.gif "unknown"
+![](encourager.gif "unknown")
+
 * 姓名：不认识
 * 生日：NA
 * 国籍：韩国
