@@ -1,0 +1,5 @@
+# 基于官方tomcat镜像
+FROM tomcat:8.5
+
+# 作者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
