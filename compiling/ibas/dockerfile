@@ -13,10 +13,14 @@ RUN set -x \
 # 安装MAVEN
     && apt-get install -y maven \
 # 安装NODE
-    && apt-get install -y nodejs-legacy \
+    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+    && apt-get install -y nodejs \
 # 安装NPM
-    && apt-get install -y npm \
+    && curl -sL https://npmjs.org/install.sh -O \
+    && chmod 777 install.sh && ./install.sh
+    && rm -rf ./install.sh
 # 安装TYPESCRIPT
     && npm install -g typescript \
 # 删除源
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
