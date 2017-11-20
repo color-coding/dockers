@@ -1,0 +1,20 @@
+# 基于镜像debian
+FROM colorcoding/compiling:ibas
+
+# 维护者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+# 工具版本
+ARG TEE_VERSION=14.123.1
+
+# 安装环境
+RUN set -x \
+# 初始化环境
+    && mkdir -p /usr/share/tee-clc \
+# 下载TEE
+    && curl -L https://github.com/Microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip -o ./tee-clc.zip \
+# 解压安装
+    && unzip -o ./tee-clc.zip -d /usr/share/tee-clc/ \
+    && ln -s /usr/share/tee-clc/tf /usr/bin/tf \
+# 删除文件
+    && rm -rf ./tee-clc.zip
