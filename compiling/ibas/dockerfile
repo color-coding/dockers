@@ -17,9 +17,7 @@ RUN set -x \
     && apt-get install -y nodejs-legacy \
     && apt-get install -y nodejs-dev \
 # 安装NPM
-    && curl -sL https://npmjs.org/install.sh -O \
-    && chmod 777 install.sh && ./install.sh \
-    && rm -rf ./install.sh \
+    && apt-get install -y npm \
 # 安装TYPESCRIPT
     && npm install -g typescript \
 # 删除源
