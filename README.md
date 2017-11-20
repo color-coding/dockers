@@ -1,16 +1,11 @@
 # dockers
-发布的docker镜像的docker file
+配置好的相关docker镜像
 
-### 鼓励师 | encourager
-![](encourager.gif "unknown")
+## 项目结构 | Projects
+* compiling        编译环境
+* running          运行环境
+* supporting       支持环境
 
-* 姓名：不认识
-* 生日：NA
-* 国籍：韩国
-
-### 使用说明 | instructions
-* nginx     基于官方镜像的升级版nginx
-* tomcat    基于官方镜像的升级版tomcat
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
