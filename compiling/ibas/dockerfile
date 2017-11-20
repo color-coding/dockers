@@ -7,13 +7,13 @@ MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
 # 安装环境
 RUN set -x \
 # 更新源
-    && apt-get update \
+    && apt-get clean && apt-get update \
 # 安装JDK
     && apt-get install -y openjdk-8-jdk-headless \
 # 安装MAVEN
     && apt-get install -y maven \
-# 安装NODE
-    && apt-get install -y nodejs \
+# 安装NPM
+    && apt-get install -y npm \
 # 安装TYPESCRIPT
     && npm install -g typescript \
 # 删除源
