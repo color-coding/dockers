@@ -8,7 +8,7 @@ echo '    1. 调用dockerfile4all创建镜像。                                
 echo '    2. 参数1，构建的镜像标签，默认为时间戳。                                '
 echo '****************************************************************************'
 # 定义变量
-NAME=colorcoding/compiling4ibas
+NAME=colorcoding/compiling
 TAG=$1
 if [ "${TAG}" == "" ]; then TAG=$(date +%s); fi;
 NAME_TAG=${NAME}:${TAG}
