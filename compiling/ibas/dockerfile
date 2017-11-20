@@ -13,7 +13,7 @@ RUN set -x \
 # 安装MAVEN
     && apt-get install -y maven \
 # 安装NODE
-    && apt-get install -y nodejs \
+    && apt-get install -y nodejs-legacy \
 # 安装NPM
     && apt-get install -y npm \
 # 安装TYPESCRIPT
