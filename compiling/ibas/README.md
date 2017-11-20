@@ -7,6 +7,7 @@ ibas应用的编译环境
 * maven
 * node
 * typescript
+* tee(dockerfile-tee)
 
 ## 使用说明 | instruction
 docker pull colorcoding/compiling:ibas
