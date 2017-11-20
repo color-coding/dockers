@@ -12,9 +12,9 @@ RUN set -x \
 # 初始化环境
     && mkdir -p /usr/share/tee-clc \
 # 下载TEE
-    && curl -L https://github.com/Microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip -o ./tee-clc.zip \
+    && curl -L https://github.com/Microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip -O \
 # 解压安装
-    && unzip -o ./tee-clc.zip -d /usr/share/tee-clc/ \
-    && ln -s /usr/share/tee-clc/tf /usr/bin/tf \
+    && unzip -o TEE-CLC-${TEE_VERSION}.zip -d /usr/share/ \
+    && ln -s /usr/share/TEE-CLC-${TEE_VERSION}/tf /usr/bin/tf \
 # 删除文件
     && rm -rf ./tee-clc.zip
