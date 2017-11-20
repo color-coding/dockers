@@ -13,6 +13,7 @@ RUN set -x \
 # 安装MAVEN
     && apt-get install -y maven \
 # 安装NODE
+    && apt-get install -y nodejs \
     && apt-get install -y nodejs-legacy \
     && apt-get install -y nodejs-dev \
 # 安装NPM
