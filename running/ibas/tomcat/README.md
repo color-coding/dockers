@@ -1,4 +1,4 @@
-# tomcat4ibas
+# tomcat:ibas
 ibas应用的运行环境
 
 ## 主要内容 | content
@@ -10,7 +10,7 @@ ibas应用的运行环境
 * initialize_datas.sh                 注册应用模块脚本
 
 ## 使用说明 | instruction
-docker pull colorcoding/tomcat4ibas
+docker pull colorcoding/tomcat:ibas
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
