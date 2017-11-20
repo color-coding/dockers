@@ -13,7 +13,6 @@ RUN set -x \
 # 安装MAVEN
     && apt-get install -y maven \
 # 安装NODE
-    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -y nodejs \
 # 安装NPM
     && curl -sL https://npmjs.org/install.sh -O \
