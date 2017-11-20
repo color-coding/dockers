@@ -14,6 +14,7 @@ RUN set -x \
     && apt-get install -y maven \
 # 安装NODE
     && apt-get install -y nodejs-legacy \
+    && apt-get install -y nodejs-dev \
 # 安装NPM
     && curl -sL https://npmjs.org/install.sh -O \
     && chmod 777 install.sh && ./install.sh \
