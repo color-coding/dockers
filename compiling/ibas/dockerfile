@@ -12,6 +12,8 @@ RUN set -x \
     && apt-get install -y openjdk-8-jdk-headless \
 # 安装MAVEN
     && apt-get install -y maven \
+# 安装NODE
+    && apt-get install -y nodejs \
 # 安装NPM
     && apt-get install -y npm \
 # 安装TYPESCRIPT
