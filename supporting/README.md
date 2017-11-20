@@ -3,11 +3,13 @@
 
 ## 主要内容 | content
 * 创建maven仓库
+~~~
 docker run -d \
   --name nexus \
   -v /data/ibas/nexus-data:/nexus-data \
   -m 1280m \
   sonatype/nexus3
+~~~
 
 
 ### 鸣谢 | thanks
