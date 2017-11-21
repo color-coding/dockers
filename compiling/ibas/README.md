@@ -10,7 +10,16 @@ ibas应用的编译环境
 * tee(dockerfile-tee)
 
 ## 使用说明 | instruction
+* debian
+~~~
 docker pull colorcoding/compiling:ibas
+docker pull colorcoding/compiling:ibas-tee
+~~~
+* alpine
+~~~
+docker pull colorcoding/compiling:ibas-alpine
+docker pull colorcoding/compiling:ibas-tee-alpine
+~~~
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
