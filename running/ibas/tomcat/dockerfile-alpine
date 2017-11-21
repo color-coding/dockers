@@ -43,8 +43,8 @@ COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/* ${IBAS_HOME}/
 COPY ibas_tools/* ${IBAS_TOOLS}/
 COPY *.sh ${CATALINA_HOME}/
+
 # 初始化环境
 RUN \
-    chmod 755 ${CATALINA_HOME}/*.sh \
     rm -rf ${IBAS_DEPLOY} \
     mkdir -p ${IBAS_DEPLOY}
