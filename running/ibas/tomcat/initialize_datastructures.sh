@@ -21,14 +21,14 @@ if [ ! -e "${TOOLS_TRANSFORM}" ];then
 fi;
 # 设置DEPLOY目录
 IBAS_DEPLOY=$1
-if [ "${IBAS_DEPLOY}" == "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
+if [ "${IBAS_DEPLOY}" = "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
 if [ ! -e "${IBAS_DEPLOY}" ];then
   echo not found webapps.
   exit 1;
 fi;
 # 设置LIB目录
 IBAS_LIB=$2
-if [ "${IBAS_LIB}" == "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
+if [ "${IBAS_LIB}" = "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
 
 # 数据库信息
 CompanyId=CC
@@ -63,7 +63,7 @@ function getConfigValue()
      do     
        TAG_NAME=${ENTITY%% *}
        ATTRIBUTES=${ENTITY#* }
-       if [[ $TAG_NAME == "add" ]]
+       if [[ $TAG_NAME = "add" ]]
          then
            key=`getAttr ${ATTRIBUTES} "key"`
            value=`getAttr ${ATTRIBUTES} "value"`
@@ -75,23 +75,23 @@ function getConfigValue()
 # 修正参数值
   MasterDbType=$(echo $MasterDbType | tr '[A-Z]' '[a-z]')
 # 数据库架构修正
-  if [ "${MasterDbType}" == "mssql" ];then
-    if [ "${MasterDbSchema}" == "" ];then MasterDbSchema=dbo; fi;
+  if [ "${MasterDbType}" = "mssql" ];then
+    if [ "${MasterDbSchema}" = "" ];then MasterDbSchema=dbo; fi;
   else
     MasterDbSchema=
   fi;
 # 数据库端口修正
-  if [ "${MasterDbType}" == "mssql" ];then
-    if [ "${MasterDbPort}" == "" ];then MasterDbPort=1433; fi;
+  if [ "${MasterDbType}" = "mssql" ];then
+    if [ "${MasterDbPort}" = "" ];then MasterDbPort=1433; fi;
   fi;
-  if [ "${MasterDbType}" == "mysql" ];then
-    if [ "${MasterDbPort}" == "" ];then MasterDbPort=3306; fi;
+  if [ "${MasterDbType}" = "mysql" ];then
+    if [ "${MasterDbPort}" = "" ];then MasterDbPort=3306; fi;
   fi;
-  if [ "${MasterDbType}" == "pgsql" ];then
-    if [ "${MasterDbPort}" == "" ];then MasterDbPort=5432; fi;
+  if [ "${MasterDbType}" = "pgsql" ];then
+    if [ "${MasterDbPort}" = "" ];then MasterDbPort=5432; fi;
   fi;
-  if [ "${MasterDbType}" == "hana" ];then
-    if [ "${MasterDbPort}" == "" ];then MasterDbPort=30015; fi;
+  if [ "${MasterDbType}" = "hana" ];then
+    if [ "${MasterDbPort}" = "" ];then MasterDbPort=30015; fi;
   fi;
 }
 # 创建数据结构
@@ -99,7 +99,7 @@ function createDS()
 {
 # 参数1，使用的jar包
   JarFile=$1;
-  if [[ $MasterDbServer == *:* ]];then
+  if [[ $MasterDbServer = *:* ]];then
 # 如果服务器地址包含端口，则使用此端口
     tmpMasterDbPort=${MasterDbServer##*:};
     if [ -n "${tmpMasterDbPort}" ];then
