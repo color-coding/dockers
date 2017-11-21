@@ -24,6 +24,8 @@ RUN set -x \
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/* ${CATALINA_HOME}/ibas/
 COPY ibas_tools/* ${CATALINA_HOME}/ibas_tools/
-COPY *.sh ${CATALINA_HOME}/
+COPY deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh
+COPY initialize_datas_ash.sh ${CATALINA_HOME}/initialize_datas.sh
+COPY initialize_datastructures_ash.sh ${CATALINA_HOME}/initialize_datastructures.sh
 
 VOLUME ${CATALINA_HOME}/ibas/
