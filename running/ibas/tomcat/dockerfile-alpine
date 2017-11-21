@@ -31,20 +31,17 @@ ENV \
     IBAS_DEPLOY=${CATALINA_HOME}/webapps
 
 # 创建数据文件夹
-RUN \
-    mkdir -p ${IBAS_LIB} \
+RUN set -x \
+    && mkdir -p ${IBAS_LIB} \
     && mkdir -p ${IBAS_TOOLS} \
     && mkdir -p ${IBAS_CONF} \
     && mkdir -p ${IBAS_DATA} \
-    && mkdir -p ${IBAS_LOG}
+    && mkdir -p ${IBAS_LOG} \
+    && rm -rf ${IBAS_DEPLOY} \
+    && mkdir -p ${IBAS_DEPLOY}
 
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/* ${IBAS_HOME}/
 COPY ibas_tools/* ${IBAS_TOOLS}/
 COPY *.sh ${CATALINA_HOME}/
-
-# 初始化环境
-RUN \
-    rm -rf ${IBAS_DEPLOY} \
-    mkdir -p ${IBAS_DEPLOY}
