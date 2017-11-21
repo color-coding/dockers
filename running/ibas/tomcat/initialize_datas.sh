@@ -21,14 +21,14 @@ if [ ! -e "${TOOLS_TRANSFORM}" ];then
 fi;
 # 设置DEPLOY目录
 IBAS_DEPLOY=$1
-if [ "${IBAS_DEPLOY}" == "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
+if [ "${IBAS_DEPLOY}" = "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
 if [ ! -e "${IBAS_DEPLOY}" ];then
   echo not found webapps.
   exit 1;
 fi;
 # 设置LIB目录
 IBAS_LIB=$2
-if [ "${IBAS_LIB}" == "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
+if [ "${IBAS_LIB}" = "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
 
 # 显示参数信息
 echo ----------------------------------------------------

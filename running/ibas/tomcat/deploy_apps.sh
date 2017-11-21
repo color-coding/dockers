@@ -19,7 +19,7 @@ OPNAME=`date '+%Y%m%d_%H%M%S'`
 WORK_FOLDER=$PWD
 # 设置ibas目录
 IBAS_HOME=$1
-if [ "${IBAS_HOME}" == "" ];then IBAS_HOME=${WORK_FOLDER}/ibas; fi;
+if [ "${IBAS_HOME}" = "" ];then IBAS_HOME=${WORK_FOLDER}/ibas; fi;
 if [ ! -e "${IBAS_HOME}" ];then mkdir -p "${IBAS_HOME}"; fi;
 # ibas配置目录
 IBAS_CONF=${IBAS_HOME}/conf
@@ -32,15 +32,15 @@ IBAS_LOG=${IBAS_HOME}/logs
 if [ ! -e "${IBAS_LOG}" ];then mkdir -p "${IBAS_LOG}"; fi;
 # 设置IBAS_PACKAGE目录
 IBAS_PACKAGE=$2
-if [ "${IBAS_PACKAGE}" == "" ];then IBAS_PACKAGE=${WORK_FOLDER}/ibas_packages; fi;
+if [ "${IBAS_PACKAGE}" = "" ];then IBAS_PACKAGE=${WORK_FOLDER}/ibas_packages; fi;
 if [ ! -e "${IBAS_PACKAGE}" ];then mkdir -p "${IBAS_PACKAGE}"; fi;
 # 设置IBAS_DEPLOY目录
 IBAS_DEPLOY=$3
-if [ "${IBAS_DEPLOY}" == "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
+if [ "${IBAS_DEPLOY}" = "" ];then IBAS_DEPLOY=${WORK_FOLDER}/webapps; fi;
 if [ ! -e "${IBAS_DEPLOY}" ];then mkdir -p "${IBAS_DEPLOY}"; fi;
 # 设置IBAS_LIB目录
 IBAS_LIB=$4
-if [ "${IBAS_LIB}" == "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
+if [ "${IBAS_LIB}" = "" ];then IBAS_LIB=${WORK_FOLDER}/ibas_lib; fi;
 if [ ! -e "${IBAS_LIB}" ];then mkdir -p "${IBAS_LIB}"; fi;
 # 设置备份目录
 IBAS_PACKAGE_BACKUP=${IBAS_PACKAGE}/backup/${OPNAME}/
