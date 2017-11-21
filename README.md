@@ -2,11 +2,26 @@
 配置好的相关docker镜像
 
 ### 编译环境 | compiling
-* docker pull colorcoding/compiling:ibas
-* docker pull colorcoding/compiling:ibas-tee
+* debian
+~~~
+docker pull colorcoding/compiling:ibas
+docker pull colorcoding/compiling:ibas-tee
+~~~
+* alpine
+~~~
+docker pull colorcoding/compiling:ibas-alpine
+docker pull colorcoding/compiling:ibas-tee-alpine
+~~~
 
 ### 运行环境 | running
-* docker pull colorcoding/tomcat:ibas
+* debian
+~~~
+docker pull colorcoding/tomcat:ibas
+~~~
+* alpine
+~~~
+docker pull colorcoding/tomcat:ibas-alpine
+~~~
 
 ### 支持环境 | supporting
 * docker pull sonatype/nexus3
