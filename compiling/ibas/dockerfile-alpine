@@ -1,0 +1,32 @@
+# 基于镜像alpine
+FROM alpine:latest
+
+# 维护者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+# 安装环境
+RUN set -x \
+# 更新源
+    && apk update \
+# 安装JDK
+    && apk add --no-cache openjdk8 \
+# 安装MAVEN
+    && apk add --no-cache maven \
+# 安装NODE
+    && apk add --no-cache nodejs nodejs-npm \
+# 安装TYPESCRIPT
+    && npm install -g typescript \
+# 安装GIT
+    && apk add --no-cache git \
+# 删除源
+    && rm -rf /var/cache/apk/*
+
+# 定义环境变量
+ENV \
+# 代码目录
+    CODE_HOME=/home/code
+# 初始化环境
+RUN mkdir -p ${CODE_HOME}
+
+# 设置工作目录
+WORKDIR ${CODE_HOME}

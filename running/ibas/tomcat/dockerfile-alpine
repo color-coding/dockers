@@ -1,0 +1,50 @@
+# 基于官方tomcat镜像
+FROM tomcat:8.5-alpine
+
+# 作者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+# 安装工具
+RUN set -x \
+# 更新源
+    && apk update \
+# 安装UNZIP
+    && apk add --no-cache unzip \
+# 删除源
+    && rm -rf /var/cache/apk/*
+
+# 定义环境变量
+ENV \
+# ibas目录
+    IBAS_HOME=${CATALINA_HOME}/ibas \
+# ibas配置目录
+    IBAS_CONF=${IBAS_HOME}/conf \
+# ibas数据目录
+    IBAS_DATA=${IBAS_HOME}/data \
+# ibas日志目录
+    IBAS_LOG=${IBAS_HOME}/logs \
+# ibas工具目录
+    IBAS_TOOLS=${CATALINA_HOME}/ibas_tools \
+# ibas共享目录
+    IBAS_LIB=${CATALINA_HOME}/ibas_lib \
+# ibas部署目录
+    IBAS_DEPLOY=${CATALINA_HOME}/webapps
+
+# 创建数据文件夹
+RUN \
+    mkdir -p ${IBAS_LIB} \
+    && mkdir -p ${IBAS_TOOLS} \
+    && mkdir -p ${IBAS_CONF} \
+    && mkdir -p ${IBAS_DATA} \
+    && mkdir -p ${IBAS_LOG}
+
+# 拷贝配置文件
+COPY conf/* ${CATALINA_HOME}/conf/
+COPY ibas/* ${IBAS_HOME}/
+COPY ibas_tools/* ${IBAS_TOOLS}/
+COPY *.sh ${CATALINA_HOME}/
+# 初始化环境
+RUN \
+    chmod 755 ${CATALINA_HOME}/*.sh \
+    rm -rf ${IBAS_DEPLOY} \
+    mkdir -p ${IBAS_DEPLOY}
