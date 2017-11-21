@@ -48,11 +48,11 @@ echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
 # 获取属性值
-function getAttr()  
-{  
-   ATTR_PAIR=${1#*$2=\"}  
-   echo "${ATTR_PAIR%%\"*}"  
-} 
+function getAttr()
+{
+   ATTR_PAIR=${1#*$2=\"}
+   echo "${ATTR_PAIR%%\"*}"
+}
 # 从app.xml中获取配置项，参数1：配置文件
 function getConfigValue()
 {
@@ -60,7 +60,7 @@ function getConfigValue()
    local IFS=\>
 
    while read -d \< ENTITY CONTENT
-     do     
+     do
        TAG_NAME=${ENTITY%% *}
        ATTRIBUTES=${ENTITY#* }
        if [[ $TAG_NAME = "add" ]]
@@ -71,7 +71,7 @@ function getConfigValue()
            eval "${key}='${value}'"
         fi
      done < ${CONFIG_FILE}
-     
+
 # 修正参数值
   MasterDbType=$(echo $MasterDbType | tr '[A-Z]' '[a-z]')
 # 数据库架构修正
@@ -95,7 +95,7 @@ function getConfigValue()
   fi;
 }
 # 创建数据结构
-function createDS()  
+function createDS()
 {
 # 参数1，使用的jar包
   JarFile=$1;

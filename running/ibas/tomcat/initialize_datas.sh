@@ -38,7 +38,7 @@ echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
 # 初始化数据
-function initDatas()  
+function initDatas()
 {
 # 参数1，使用的jar包
   JarFile=$1;
