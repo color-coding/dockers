@@ -48,13 +48,13 @@ echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
 # 获取属性值
-function getAttr()
+getAttr()
 {
    ATTR_PAIR=${1#*$2=\"}
    echo "${ATTR_PAIR%%\"*}"
 }
 # 从app.xml中获取配置项，参数1：配置文件
-function getConfigValue()
+getConfigValue()
 {
    CONFIG_FILE=$1;
    local IFS=\>
@@ -95,7 +95,7 @@ function getConfigValue()
   fi;
 }
 # 创建数据结构
-function createDS()
+createDS()
 {
 # 参数1，使用的jar包
   JarFile=$1;
