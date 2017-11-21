@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 echo '****************************************************************************'
 echo '     initialize_datas.sh                                                    '
 echo '            by niuren.zhu                                                   '
