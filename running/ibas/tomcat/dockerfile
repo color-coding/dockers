@@ -28,3 +28,5 @@ COPY ibas_tools/* ${CATALINA_HOME}/ibas_tools/
 COPY *.sh ${CATALINA_HOME}/
 
 RUN chmod 775 ${CATALINA_HOME}/*.sh
+
+VOLUME ${CATALINA_HOME}/ibas/

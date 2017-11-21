@@ -25,3 +25,5 @@ COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/* ${CATALINA_HOME}/ibas/
 COPY ibas_tools/* ${CATALINA_HOME}/ibas_tools/
 COPY *.sh ${CATALINA_HOME}/
+
+VOLUME ${CATALINA_HOME}/ibas/
