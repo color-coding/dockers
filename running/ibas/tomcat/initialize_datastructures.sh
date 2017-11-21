@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo '****************************************************************************'
 echo '     initialize_datastructures.sh                                           '
 echo '            by niuren.zhu                                                   '
@@ -9,6 +9,7 @@ echo '    2. 参数1，待分析的目录，默认.\webapps。                  
 echo '    3. 参数2，共享库目录，默认.\ibas_lib。                                  '
 echo '    4. 提前下载btulz.transforms并放置.\ibas_tools\目录。                    '
 echo '    5. 提前配置app.xml的数据库信息。                                        '
+echo '    6. 脚本用到function所以需要bash。                                       '
 echo '****************************************************************************'
 # 设置参数变量
 WORK_FOLDER=$PWD
@@ -48,13 +49,13 @@ echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
 # 获取属性值
-getAttr()
+function getAttr()
 {
    ATTR_PAIR=${1#*$2=\"}
    echo "${ATTR_PAIR%%\"*}"
 }
 # 从app.xml中获取配置项，参数1：配置文件
-getConfigValue()
+function getConfigValue()
 {
    CONFIG_FILE=$1;
    local IFS=\>
@@ -95,7 +96,7 @@ getConfigValue()
   fi;
 }
 # 创建数据结构
-createDS()
+function createDS()
 {
 # 参数1，使用的jar包
   JarFile=$1;

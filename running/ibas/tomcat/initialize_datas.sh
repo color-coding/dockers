@@ -1,14 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 echo '****************************************************************************'
 echo '     initialize_datas.sh                                                    '
 echo '            by niuren.zhu                                                   '
 echo '               2017.03.22                                                   '
-echo '  说明：                                                                     '
-echo '    1. 分析jar包并初始化数据，数据库信息取值app.xml。                             '
-echo '    2. 参数1，待分析的目录，默认.\webapps。                                     '
-echo '    3. 参数2，共享库目录，默认.\ibas_lib。                                      '
-echo '    4. 提前下载btulz.transforms并放置.\ibas_tools\目录。                       '
-echo '    5. 提前配置app.xml的数据库信息。                                            '
+echo '  说明：                                                                    '
+echo '    1. 分析jar包并初始化数据，数据库信息取值app.xml。                       '
+echo '    2. 参数1，待分析的目录，默认.\webapps。                                 '
+echo '    3. 参数2，共享库目录，默认.\ibas_lib。                                  '
+echo '    4. 提前下载btulz.transforms并放置.\ibas_tools\目录。                    '
+echo '    5. 提前配置app.xml的数据库信息。                                        '
+echo '    6. 脚本用到function所以需要bash。                                       '
 echo '****************************************************************************'
 # 设置参数变量
 WORK_FOLDER=$PWD
@@ -38,7 +39,7 @@ echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
 # 初始化数据
-initDatas()
+function initDatas()
 {
 # 参数1，使用的jar包
   JarFile=$1;
