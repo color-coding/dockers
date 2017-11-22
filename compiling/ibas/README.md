@@ -8,17 +8,20 @@ ibas应用的编译环境
 * node
 * typescript
 * tee(dockerfile-tee)
+* git-tf(dockerfile-gtf)
 
 ## 使用说明 | instruction
 * debian
 ~~~
 docker pull colorcoding/compiling:ibas
 docker pull colorcoding/compiling:ibas-tee
+docker pull colorcoding/compiling:ibas-gtf
 ~~~
 * alpine
 ~~~
 docker pull colorcoding/compiling:ibas-alpine
 docker pull colorcoding/compiling:ibas-tee-alpine
+docker pull colorcoding/compiling:ibas-gtf-alpine
 ~~~
 
 ### 鸣谢 | thanks
