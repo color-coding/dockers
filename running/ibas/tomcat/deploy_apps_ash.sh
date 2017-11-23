@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 echo '*************************************************************************************'
 echo '             deploy_apps.sh                                                          '
 echo '                      by niuren.zhu                                                  '
@@ -92,10 +92,10 @@ while read file
         fi;
 # 映射日志文件夹到统一位置
         if [ -e "${IBAS_DEPLOY}/${folder}/WEB-INF/logs" ]; then rm -rf "${IBAS_DEPLOY}/${folder}/WEB-INF/logs"; fi;
-        ln -s -d "${IBAS_LOG}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
+        ln -s "${IBAS_LOG}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
 # 映射数据文件夹到统一位置
         if [ -e "${IBAS_DEPLOY}/${folder}/WEB-INF/data" ]; then rm -rf "${IBAS_DEPLOY}/${folder}/WEB-INF/data"; fi;
-        ln -s -d "${IBAS_DATA}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
+        ln -s "${IBAS_DATA}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
 # 集中共享jar包
         if [ -e "${IBAS_LIB}" ]
         then
