@@ -15,17 +15,19 @@ RUN set -x \
 
 # 创建数据文件夹
 RUN set -x \
-    && mkdir -p ${CATALINA_HOME}/ibas/ \
-    && mkdir -p ${CATALINA_HOME}/ibas_tools/ \
+    && mkdir -p ${CATALINA_HOME}/ibas \
+    && mkdir -p ${CATALINA_HOME}/ibas_tools \
     && rm -rf ${CATALINA_HOME}/webapps \
     && mkdir -p ${CATALINA_HOME}/webapps
 
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
-COPY ibas/* ${CATALINA_HOME}/ibas/
-COPY ibas_tools/* ${CATALINA_HOME}/ibas_tools/
+COPY ibas/ ${CATALINA_HOME}/ibas/
+COPY ibas_tools/ ${CATALINA_HOME}/ibas_tools/
 COPY deploy_apps_ash.sh ${CATALINA_HOME}/deploy_apps.sh
 COPY initialize_datas_ash.sh ${CATALINA_HOME}/initialize_datas.sh
 COPY initialize_datastructures_ash.sh ${CATALINA_HOME}/initialize_datastructures.sh
+
+RUN chmod 775 ${CATALINA_HOME}/*.sh
 
 VOLUME ${CATALINA_HOME}/ibas/
