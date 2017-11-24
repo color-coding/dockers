@@ -16,6 +16,9 @@ RUN set -x \
 # 创建数据文件夹
 RUN set -x \
     && mkdir -p ${CATALINA_HOME}/ibas \
+    && mkdir -p ${CATALINA_HOME}/ibas/conf \
+    && mkdir -p ${CATALINA_HOME}/ibas/data \
+    && mkdir -p ${CATALINA_HOME}/ibas/logs \
     && mkdir -p ${CATALINA_HOME}/ibas_tools \
     && rm -rf ${CATALINA_HOME}/webapps \
     && mkdir -p ${CATALINA_HOME}/webapps
