@@ -21,11 +21,12 @@ RUN set -x \
 # 删除源
     && rm -rf /var/cache/apk/*
 
-# 环境变量-代码目录
-ENV CODE_HOME=/home/code
 # 环境变量-JAVA目录
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-ENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
+# 环境变量-MAVEN目录
+ENV MAVEN_HOME /usr/share/java/maven-3
+# 环境变量-代码目录
+ENV CODE_HOME=/home/code
 
 # 初始化环境
 RUN mkdir -p ${CODE_HOME}
