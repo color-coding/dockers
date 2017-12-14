@@ -26,7 +26,7 @@ RUN set -x \
 # 下载并部署工具
 RUN set -x \
     && curl -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
-    && tar -xzf /tmp/btulz.transforms.tar -C ${CATALINA_HOME}/ibas_tools \
+    && tar -xvf /tmp/btulz.transforms.tar -C ${CATALINA_HOME}/ibas_tools \
     && rm -f /tmp/btulz.transforms.tar
 
 # 拷贝配置文件
