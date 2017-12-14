@@ -6,11 +6,11 @@ MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
 
 # 安装工具
 RUN set -x \
-# 更新源
+    # 更新源
     && apt-get update \
-# 安装UNZIP
+    # 安装UNZIP
     && apt-get install -y unzip \
-# 删除源
+    # 删除源
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,10 +24,15 @@ RUN set -x \
     && rm -rf ${CATALINA_HOME}/webapps \
     && mkdir -p ${CATALINA_HOME}/webapps
 
+# 下载并部署工具
+RUN set -x \
+    && curl -fsSL http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
+    && tar -xzf ./btulz.transforms-latest.tar -C ${CATALINA_HOME}/ibas_tools \
+    && rm -f ./btulz.transforms-latest.tar
+
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/ ${CATALINA_HOME}/ibas/
-COPY ibas_tools/ ${CATALINA_HOME}/ibas_tools/
 COPY deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh
 COPY initialize_datas.sh ${CATALINA_HOME}/initialize_datas.sh
 COPY initialize_datastructures.sh ${CATALINA_HOME}/initialize_datastructures.sh

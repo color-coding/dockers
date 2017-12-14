@@ -2,10 +2,10 @@
   "appSettings": {
     "company": "CC",
     "debug": false,
-    "language": "zh_CN",
     "offline": false,
-    "offline|BORepositoryShell": false,
-    "helpUrl": "http://www.baidu.com",
+    "language": "zh_CN",
+    "helpUrl": "https://colorcoding.org/ibas/help",
+    "welcomeUrl": "https://colorcoding.org/ibas/welcome",
     "defaultUser": "admin",
     "defaultPassword": "1q2w3e",
     "defaultBOEServer": ".../businessobjectsenterprise/services/rest/data",

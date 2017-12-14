@@ -23,10 +23,15 @@ RUN set -x \
     && rm -rf ${CATALINA_HOME}/webapps \
     && mkdir -p ${CATALINA_HOME}/webapps
 
+# 下载并部署工具
+RUN set -x \
+    && curl -fsSL http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
+    && tar -xzf ./btulz.transforms-latest.tar -C ${CATALINA_HOME}/ibas_tools \
+    && rm -f ./btulz.transforms-latest.tar
+
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/ ${CATALINA_HOME}/ibas/
-COPY ibas_tools/ ${CATALINA_HOME}/ibas_tools/
 COPY deploy_apps_ash.sh ${CATALINA_HOME}/deploy_apps.sh
 COPY initialize_datas_ash.sh ${CATALINA_HOME}/initialize_datas.sh
 COPY initialize_datastructures_ash.sh ${CATALINA_HOME}/initialize_datastructures.sh

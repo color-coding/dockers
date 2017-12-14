@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns:ServiceRouting xmlns:ns="http://colorcoding.org/ibas/initialfantasy/service">
+<ns:ServiceRouting 
+    xmlns:ns="http://colorcoding.org/ibas/initialfantasy/service">
     <ServiceInformation>
         <Id>c2b31c06-20d8-44a2-bb34-17f47ed01859</Id>
         <Name>InitialFantasy</Name>
@@ -257,34 +258,19 @@
         </Providers>
     </ServiceInformation>
     <ServiceInformation>
-        <Id>8d71fc16-7eb7-49d8-9ffb-5fcc91998aa2</Id>
-        <Name>Receipts</Name>
+        <Id>77d894db-e7f7-4fdd-910c-7835612407be</Id>
+        <Name>ReceiptPayment</Name>
         <Providers>
             <Provider>
-                <Address>.../receipts/services/rest/data</Address>
+                <Address>.../receiptpayment/services/rest/data</Address>
                 <Enabled>true</Enabled>
                 <Type>DATA</Type>
             </Provider>
             <Provider>
-                <Address>.../receipts/</Address>
+                <Address>.../receiptpayment/</Address>
                 <Enabled>true</Enabled>
                 <Type>VIEW</Type>
             </Provider>
         </Providers>
     </ServiceInformation>
-    <ServiceInformation>
-        <Id>0f0ddc35-04df-45be-8bea-26b354882743</Id>
-        <Name>Payments</Name>
-        <Providers>
-            <Provider>
-                <Address>.../payments/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../payments/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
 </ns:ServiceRouting>
