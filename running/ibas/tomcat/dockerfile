@@ -34,6 +34,7 @@ RUN set -x \
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/ ${CATALINA_HOME}/ibas/
 COPY deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh
+COPY initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh
 COPY initialize_datas.sh ${CATALINA_HOME}/initialize_datas.sh
 COPY initialize_datastructures.sh ${CATALINA_HOME}/initialize_datastructures.sh
 

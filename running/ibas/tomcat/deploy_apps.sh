@@ -1,17 +1,18 @@
-#!/bin/bash
+#!/bin/sh
 echo '*************************************************************************************'
 echo '             deploy_apps.sh                                                          '
 echo '                      by niuren.zhu                                                  '
 echo '                           2017.06.18                                                '
-echo '  说明：                                                                             '
-echo '    1. 部署IBAS的WAR包到应用目录，需要以管理员权限启动。                             '
+echo '  说明：                                                                              '
+echo '    1. 部署IBAS的WAR包到应用目录，需要以管理员权限启动。                                    '
 echo '    2. 参数1，IBAS数据目录，默认.\ibas。                                             '
 echo '    3. 参数2，IBAS的包位置，默认.\ibas_packages。                                    '
 echo '    4. 参数3，IBAS部署目录，默认.\webapps。                                          '
 echo '    5. 参数4，IBAS共享库目录，默认.\ibas_lib。                                       '
-echo '    6. 脚本通文件链接方式，集中配置文件和日志目录到IBAS_HOME下。                     '
-echo '    7. 请提前安装unzip，或拷贝到.\ibas_tools目录。                                   '
-echo '    8. 请调整catalina.properties的shared.loader="${catalina.home}/ibas_lib/*.jar"。  '
+echo '    6. 脚本通文件链接方式，集中配置文件和日志目录到IBAS_HOME下。                          '
+echo '    7. 请提前安装unzip，或拷贝到.\ibas_tools目录。                                       '
+echo '    8. 请调整catalina.properties的shared.loader="${catalina.home}/ibas_lib/*.jar"。   '
+echo '    9. 请在context.xml添加<Resources allowLinking="true" />。                         '
 echo '*************************************************************************************'
 # 定义变量
 OPNAME=`date '+%Y%m%d_%H%M%S'`
@@ -92,10 +93,10 @@ while read file
         fi;
 # 映射日志文件夹到统一位置
         if [ -e "${IBAS_DEPLOY}/${folder}/WEB-INF/logs" ]; then rm -rf "${IBAS_DEPLOY}/${folder}/WEB-INF/logs"; fi;
-        ln -s -d "${IBAS_LOG}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
+        ln -s "${IBAS_LOG}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
 # 映射数据文件夹到统一位置
         if [ -e "${IBAS_DEPLOY}/${folder}/WEB-INF/data" ]; then rm -rf "${IBAS_DEPLOY}/${folder}/WEB-INF/data"; fi;
-        ln -s -d "${IBAS_DATA}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
+        ln -s "${IBAS_DATA}" "${IBAS_DEPLOY}/${folder}/WEB-INF/"
 # 集中共享jar包
         if [ -e "${IBAS_LIB}" ]
         then

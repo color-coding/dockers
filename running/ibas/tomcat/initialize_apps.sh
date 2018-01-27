@@ -1,15 +1,15 @@
-#!/bin/ash
+#!/bin/sh
 echo '****************************************************************************'
-echo '     initialize_datas.sh                                                    '
+echo '     initialize_apps.sh                                                    '
 echo '            by niuren.zhu                                                   '
-echo '               2017.03.22                                                   '
+echo '               2018.01.27                                                   '
 echo '  说明：                                                                    '
-echo '    1. 分析jar包并初始化数据，数据库信息取值app.xml。                       '
+echo '    1. 分析jar包创建数据结构和初始化数据，数据库信息取值app.xml。                  '
 echo '    2. 参数1，待分析的目录，默认.\webapps。                                 '
 echo '    3. 参数2，共享库目录，默认.\ibas_lib。                                  '
 echo '    4. 提前下载btulz.transforms并放置.\ibas_tools\目录。                    '
 echo '    5. 提前配置app.xml的数据库信息。                                        '
-echo '    6. 脚本用到function所以需要bash。                                       '
+echo '    6. 注意维护ibas.release的顺序说明。                                        '
 echo '****************************************************************************'
 # 设置参数变量
 WORK_FOLDER=$PWD
@@ -38,25 +38,6 @@ echo 部署目录：${IBAS_DEPLOY}
 echo 共享目录：${IBAS_LIB}
 echo ----------------------------------------------------
 
-# 初始化数据
-function initDatas()
-{
-# 参数1，使用的jar包
-  JarFile=$1;
-# 参数2，配置文件
-  Config=$2;
-# 参数3，加载的类库
-  Classes=$3;
-# 生成命令
-  COMMOND="java \
-    -jar ${TOOLS_TRANSFORM} init \
-    ""-data=${JarFile}"" \
-    ""-config=${Config}"" \
-    ""-classes=${Classes}""";
-  echo exec: ${COMMOND};
-  eval $(echo ${COMMOND});
-}
-
 echo 开始分析${IBAS_DEPLOY}目录下数据
 # 检查是否存在模块说明文件，此文件描述模块初始化顺序。
 if [ ! -e "${IBAS_DEPLOY}/ibas.release.txt" ]
@@ -75,13 +56,16 @@ do
         FILE_CLASSES=
         for file in `ls "${IBAS_DEPLOY}/${folder}/WEB-INF/lib" | grep \..jar`
         do
-          FILE_CLASSES=${FILE_CLASSES}${IBAS_DEPLOY}/${folder}/WEB-INF/lib/${file}\\\;;
+          FILE_CLASSES=${FILE_CLASSES}${IBAS_DEPLOY}/${folder}/WEB-INF/lib/${file}\;
         done
         for file in `ls "${IBAS_DEPLOY}/${folder}/WEB-INF/lib" | grep ibas\.${folder}\-.`
         do
           echo ----${file}
           FILE_DATA=${IBAS_DEPLOY}/${folder}/WEB-INF/lib/${file}
-          initDatas "${FILE_DATA}" "${FILE_APP}" "${FILE_CLASSES}"
+          echo ----开始创建数据结构
+          java -jar ${TOOLS_TRANSFORM} ds "-data=${FILE_DATA}" "-config=${FILE_APP}"
+          echo ----开始初始化数据
+          java -jar ${TOOLS_TRANSFORM} init "-data=${FILE_DATA}" "-config=${FILE_APP}" "-classes=${FILE_CLASSES}"
           echo ----
         done
       fi;
@@ -91,13 +75,16 @@ do
         FILE_CLASSES=
         for file in `ls "${IBAS_LIB}" | grep \..jar`
         do
-          FILE_CLASSES=${FILE_CLASSES}${IBAS_LIB}/${file}\\\;;
+          FILE_CLASSES=${FILE_CLASSES}${IBAS_LIB}/${file}\;
         done
         for file in `ls "${IBAS_LIB}" | grep ibas\.${folder}\-.`
         do
           echo ----${file}
           FILE_DATA=${IBAS_LIB}/${file};
-          initDatas "${FILE_DATA}" "${FILE_APP}" "${FILE_CLASSES}"
+          echo ----开始创建数据结构
+          java -jar ${TOOLS_TRANSFORM} ds "-data=${FILE_DATA}" "-config=${FILE_APP}"
+          echo ----开始初始化数据
+          java -jar ${TOOLS_TRANSFORM} init "-data=${FILE_DATA}" "-config=${FILE_APP}" "-classes=${FILE_CLASSES}"
           echo ----
         done
       fi;

@@ -9,7 +9,8 @@ echo '    2. 参数1，待分析的目录，默认.\webapps。                  
 echo '    3. 参数2，共享库目录，默认.\ibas_lib。                                  '
 echo '    4. 提前下载btulz.transforms并放置.\ibas_tools\目录。                    '
 echo '    5. 提前配置app.xml的数据库信息。                                        '
-echo '    6. 脚本用到function所以需要bash。                                       '
+echo '    6. 注意维护ibas.release的顺序说明。                                        '
+echo '    7. 脚本用到function所以需要bash。                                       '
 echo '****************************************************************************'
 # 设置参数变量
 WORK_FOLDER=$PWD

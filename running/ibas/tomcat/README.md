@@ -12,10 +12,12 @@ ibas应用的运行环境
 ## 使用说明 | instruction
 * debian
 ~~~
+docker build --force-rm --no-cache -f ./dockerfile -t tomcat:ibas ./
 docker pull colorcoding/tomcat:ibas
 ~~~
 * alpine
 ~~~
+docker build --force-rm --no-cache -f ./dockerfile-alpine -t tomcat:ibas-alpine ./
 docker pull colorcoding/tomcat:ibas-alpine
 ~~~
 

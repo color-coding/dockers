@@ -32,9 +32,8 @@ RUN set -x \
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/ ${CATALINA_HOME}/ibas/
-COPY deploy_apps_ash.sh ${CATALINA_HOME}/deploy_apps.sh
-COPY initialize_datas_ash.sh ${CATALINA_HOME}/initialize_datas.sh
-COPY initialize_datastructures_ash.sh ${CATALINA_HOME}/initialize_datastructures.sh
+COPY deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh
+COPY initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh
 
 RUN chmod 775 ${CATALINA_HOME}/*.sh
 

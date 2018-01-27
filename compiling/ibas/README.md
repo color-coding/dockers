@@ -13,12 +13,14 @@ ibas应用的编译环境
 ## 使用说明 | instruction
 * debian
 ~~~
+docker build --force-rm --no-cache -f ./dockerfile -t compiling:ibas ./
 docker pull colorcoding/compiling:ibas
 docker pull colorcoding/compiling:ibas-tee
 docker pull colorcoding/compiling:ibas-gtf
 ~~~
 * alpine
 ~~~
+docker build --force-rm --no-cache -f ./dockerfile-alpine -t compiling:ibas-alpine ./
 docker pull colorcoding/compiling:ibas-alpine
 docker pull colorcoding/compiling:ibas-tee-alpine
 docker pull colorcoding/compiling:ibas-gtf-alpine
