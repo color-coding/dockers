@@ -8,8 +8,8 @@ MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
 RUN set -x \
 # 更新源
     && apk update \
-# 安装UNZIP
-    && apk add --no-cache unzip curl \
+# 安装解压、网络请求、时区设置
+    && apk add --no-cache unzip curl tzdata \
 # 删除源
     && rm -rf /var/cache/apk/*
 

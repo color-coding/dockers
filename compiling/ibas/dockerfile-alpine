@@ -18,6 +18,8 @@ RUN set -x \
     && npm install -g typescript \
 # 安装GIT
     && apk add --no-cache git \
+# 安装时区工具
+    && apk add --no-cache tzdata \
 # 删除源
     && rm -rf /var/cache/apk/*
 

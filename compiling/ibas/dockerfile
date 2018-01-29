@@ -17,6 +17,8 @@ RUN set -x \
     && apt-get install -y maven \
     # 安装转码工具
     && apt-get install -y dos2unix \
+    # 安装时区工具
+    && apt-get install -y tzdata \
     # 删除源
     && apt-get autoremove \
     && apt-get clean \
