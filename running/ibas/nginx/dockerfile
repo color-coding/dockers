@@ -1,0 +1,28 @@
+# 基于官方nginx镜像
+FROM nginx:latest
+
+# 作者
+MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+
+# 安装工具
+RUN set -x \
+    # 更新源
+    && apt-get update \
+    # 安装解压
+    && apt-get install -y unzip \
+    # 删除源
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 环境变量-NGINX目录
+ENV NGINX_HOME /usr/share/nginx
+# 创建数据文件夹
+RUN set -x \
+    && mkdir -p ${NGINX_HOME}
+
+# 拷贝脚本
+COPY deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh
+
+RUN chmod 775 ${NGINX_HOME}/*.sh
+
+VOLUME ${NGINX_HOME}
