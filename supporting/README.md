@@ -2,7 +2,7 @@
 支持环境镜像
 
 ## 主要内容 | content
-* 创建maven仓库
+* 创建maven仓库（nexus oss）
 ~~~
 docker run -d \
   --name nexus \

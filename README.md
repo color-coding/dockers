@@ -17,10 +17,12 @@ docker pull colorcoding/compiling:ibas-tee-alpine
 * debian
 ~~~
 docker pull colorcoding/tomcat:ibas
+docker pull colorcoding/nginx:ibas
 ~~~
 * alpine
 ~~~
 docker pull colorcoding/tomcat:ibas-alpine
+docker pull colorcoding/nginx:ibas-alpine
 ~~~
 
 ### 支持环境 | supporting
