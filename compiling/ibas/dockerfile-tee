@@ -2,7 +2,7 @@
 FROM colorcoding/compiling:ibas
 
 # 维护者
-MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 工具版本
 ARG TEE_VERSION=14.123.1

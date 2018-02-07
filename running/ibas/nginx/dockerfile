@@ -1,8 +1,8 @@
 # 基于官方nginx镜像
 FROM nginx:latest
 
-# 作者
-MAINTAINER Niuren.Zhu "niuren.zhu@icloud.com"
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 安装工具
 RUN set -x \
