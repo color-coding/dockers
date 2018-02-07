@@ -9,7 +9,7 @@ RUN set -x \
 # 更新源
     && apk update \
 # 安装解压、网络请求
-    && apk add --no-cache unzip curl \
+    && apk add --no-cache unzip curl wget \
 # 删除源
     && rm -rf /var/cache/apk/*
 
@@ -21,7 +21,7 @@ RUN set -x \
 
 # 拷贝脚本
 COPY deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh
-
 RUN chmod 775 ${NGINX_HOME}/*.sh
 
-VOLUME ${NGINX_HOME}
+# 设置工作目录
+WORKDIR ${NGINX_HOME}

@@ -9,7 +9,7 @@ RUN set -x \
     # 更新源
     && apt-get update \
     # 安装解压
-    && apt-get install -y unzip \
+    && apt-get install -y unzip curl wget \
     # 删除源
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -22,7 +22,7 @@ RUN set -x \
 
 # 拷贝脚本
 COPY deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh
-
 RUN chmod 775 ${NGINX_HOME}/*.sh
 
-VOLUME ${NGINX_HOME}
+# 设置工作目录
+WORKDIR ${NGINX_HOME}
