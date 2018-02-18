@@ -34,6 +34,38 @@
         </Providers>
     </ServiceInformation>
     <ServiceInformation>
+        <Id>b3382a56-bdda-412c-bc2f-af17cd19142e</Id>
+        <Name>ApprovalProcess</Name>
+        <Providers>
+            <Provider>
+                <Address>.../approvalprocess/services/rest/data</Address>
+                <Enabled>true</Enabled>
+                <Type>DATA</Type>
+            </Provider>
+            <Provider>
+                <Address>.../approvalprocess/</Address>
+                <Enabled>true</Enabled>
+                <Type>VIEW</Type>
+            </Provider>
+        </Providers>
+    </ServiceInformation>
+    <ServiceInformation>
+        <Id>568e7e6d-a67a-46a8-93b9-7bc896b1c2b7</Id>
+        <Name>Integration</Name>
+        <Providers>
+            <Provider>
+                <Address>.../integration/services/rest/data</Address>
+                <Enabled>true</Enabled>
+                <Type>DATA</Type>
+            </Provider>
+            <Provider>
+                <Address>.../integration/</Address>
+                <Enabled>true</Enabled>
+                <Type>VIEW</Type>
+            </Provider>
+        </Providers>
+    </ServiceInformation>
+    <ServiceInformation>
         <Id>14f7a312-5d63-488e-bed4-ea093be6f183</Id>
         <Name>Documents</Name>
         <Providers>
@@ -82,86 +114,6 @@
         </Providers>
     </ServiceInformation>
     <ServiceInformation>
-        <Id>c4d3da42-0a53-480b-98fe-bf551a9581c7</Id>
-        <Name>BusinessObjectsEnterprise</Name>
-        <Providers>
-            <Provider>
-                <Address>.../businessobjectsenterprise/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../businessobjectsenterprise/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
-    </ServiceInformation>
-    <ServiceInformation>
-        <Id>d89c3bd0-8dab-4f62-8439-0b8a39c66bf2</Id>
-        <Name>BusinessOne</Name>
-        <Providers>
-            <Provider>
-                <Address>.../businessone/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../businessone/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
-    </ServiceInformation>
-    <ServiceInformation>
-        <Id>4d8b5b7d-b1ae-418b-abc8-67d70ae8c36e</Id>
-        <Name>BusinessOneUsers</Name>
-        <Providers>
-            <Provider>
-                <Address>.../businessone/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../businessone/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
-    </ServiceInformation>
-    <ServiceInformation>
-        <Id>568e7e6d-a67a-46a8-93b9-7bc896b1c2b7</Id>
-        <Name>Integration</Name>
-        <Providers>
-            <Provider>
-                <Address>.../integration/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../integration/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
-    </ServiceInformation>
-    <ServiceInformation>
-        <Id>bad47859-3d74-4b2b-975a-48c635406be4</Id>
-        <Name>Materials</Name>
-        <Providers>
-            <Provider>
-                <Address>.../materials/services/rest/data</Address>
-                <Enabled>true</Enabled>
-                <Type>DATA</Type>
-            </Provider>
-            <Provider>
-                <Address>.../materials/</Address>
-                <Enabled>true</Enabled>
-                <Type>VIEW</Type>
-            </Provider>
-        </Providers>
-    </ServiceInformation>
-    <ServiceInformation>
         <Id>420471fe-047f-4c73-ae26-fe9da158b614</Id>
         <Name>Feedback</Name>
         <Providers>
@@ -194,16 +146,16 @@
         </Providers>
     </ServiceInformation>
     <ServiceInformation>
-        <Id>b3382a56-bdda-412c-bc2f-af17cd19142e</Id>
-        <Name>ApprovalProcess</Name>
+        <Id>bad47859-3d74-4b2b-975a-48c635406be4</Id>
+        <Name>Materials</Name>
         <Providers>
             <Provider>
-                <Address>.../approvalprocess/services/rest/data</Address>
+                <Address>.../materials/services/rest/data</Address>
                 <Enabled>true</Enabled>
                 <Type>DATA</Type>
             </Provider>
             <Provider>
-                <Address>.../approvalprocess/</Address>
+                <Address>.../materials/</Address>
                 <Enabled>true</Enabled>
                 <Type>VIEW</Type>
             </Provider>

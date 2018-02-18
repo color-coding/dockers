@@ -8,7 +8,6 @@
     "welcomeUrl": "https://colorcoding.org/ibas/welcome",
     "defaultUser": "admin",
     "defaultPassword": "1q2w3e",
-    "defaultBOEServer": ".../businessobjectsenterprise/services/rest/data",
     "repositoryAddress|BORepositoryShell": ".../initialfantasy/services/rest/data"
   },
   "languages": [

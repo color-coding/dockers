@@ -32,7 +32,5 @@
         <add key="ReporterFactories" value="org.colorcoding.ibas.boe.reporter.ReporterFactory;" />
         <!-- 配置项目-转换者工厂，多个时“;”分隔 -->
         <add key="TransformerFactories" value="org.colorcoding.ibas.importexport.transformers.excel.TransformerFactory;" />
-        <!-- 配置项目-BOE地址 -->
-        <add key="BOEAddress" value="ibas-bo-server" />
     </appSettings>
 </ns2:configuration>
