@@ -16,6 +16,8 @@ RUN set -x \
     && apk add --no-cache nodejs nodejs-npm \
 # 安装TYPESCRIPT
     && npm install -g typescript \
+# 安装uglifyjs
+    && npm install -g uglify-es \
 # 安装GIT
     && apk add --no-cache git \
 # 安装时区工具

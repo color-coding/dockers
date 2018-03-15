@@ -6,20 +6,22 @@ LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 安装环境
 RUN set -x \
-    # 安装NODE
+# 安装NODE
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get install -y nodejs \
-    # 安装TYPESCRIPT
+# 安装TYPESCRIPT
     && npm install -g typescript \
-    # 安装JDK
+# 安装uglifyjs
+    && npm install -g uglify-es \
+# 安装JDK
     && apt-get install -y openjdk-8-jdk-headless \
-    # 安装MAVEN
+# 安装MAVEN
     && apt-get install -y maven \
-    # 安装转码工具
+# 安装转码工具
     && apt-get install -y dos2unix \
-    # 安装时区工具
+# 安装时区工具
     && apt-get install -y tzdata \
-    # 删除源
+# 删除源
     && apt-get autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
