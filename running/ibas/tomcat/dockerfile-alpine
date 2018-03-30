@@ -10,6 +10,8 @@ RUN set -x \
     && apk update \
 # 安装解压、网络请求、时区设置
     && apk add --no-cache unzip curl tzdata \
+# 安装字体
+    && apk add --no-cache fontconfig ttf-dejavu \
 # 删除源
     && rm -rf /var/cache/apk/*
 

@@ -10,6 +10,8 @@ RUN set -x \
     && apt-get update \
     # 安装解压、时区设置
     && apt-get install -y unzip tzdata \
+    # 安装字体
+    && apt-get install -y fontconfig ttf-dejavu \
     # 删除源
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
