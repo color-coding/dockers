@@ -22,15 +22,5 @@
         <add key="SerializationWay" value="jersey" />
         <!-- 配置项目-对象删除前重新加载 -->
         <add key="RefetchBeforeDelete" value="true" />
-        <!-- 配置项目-审批方法 -->
-        <add key="ApprovalWay" value="initial" />
-        <!-- 配置项目-组织方式 -->
-        <add key="OrganizationWay" value="initial" />
-        <!-- 配置项目-权限判断方式 -->
-        <add key="OwnershipWay" value="initial" />
-        <!-- 配置项目-报表工厂，多个时“;”分隔 -->
-        <add key="ReporterFactories" value="org.colorcoding.ibas.boe.reporter.ReporterFactory;" />
-        <!-- 配置项目-转换者工厂，多个时“;”分隔 -->
-        <add key="TransformerFactories" value="org.colorcoding.ibas.importexport.transformers.excel.TransformerFactory;" />
     </appSettings>
 </ns2:configuration>
