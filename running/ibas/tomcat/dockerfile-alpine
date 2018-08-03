@@ -29,13 +29,18 @@ RUN set -x \
 RUN set -x \
     && curl -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
     && tar -xvf /tmp/btulz.transforms.tar -C ${CATALINA_HOME}/ibas_tools \
-    && rm -f /tmp/btulz.transforms.tar
+    && rm -f /tmp/btulz.transforms.tar \
+    && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
+    && mkdir -p /tmp/btulz.scripts \
+    && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
+    && rm -f /tmp/btulz.scripts.tar \
+    && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh \
+    && cp -f /tmp/btulz.scripts/ibas/initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh \
+    && rm -rf /tmp/btulz.scripts
 
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
 COPY ibas/ ${CATALINA_HOME}/ibas/
-COPY deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh
-COPY initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh
 
 RUN chmod 775 ${CATALINA_HOME}/*.sh
 

@@ -19,8 +19,15 @@ ENV NGINX_HOME /usr/share/nginx
 RUN set -x \
     && mkdir -p ${NGINX_HOME}
 
-# 拷贝脚本
-COPY deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh
+# 下载并部署工具
+RUN set -x \
+    && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
+    && mkdir -p /tmp/btulz.scripts \
+    && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
+    && rm -f /tmp/btulz.scripts.tar \
+    && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh \
+    && rm -rf /tmp/btulz.scripts
+
 RUN chmod 775 ${NGINX_HOME}/*.sh
 
 # 设置工作目录
