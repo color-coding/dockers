@@ -20,6 +20,16 @@ docker pull colorcoding/tomcat:ibas
 docker build --force-rm --no-cache -f ./dockerfile-alpine -t tomcat:ibas-alpine ./
 docker pull colorcoding/tomcat:ibas-alpine
 ~~~
+* windows server core
+~~~
+docker build --force-rm --no-cache -f ./dockerfile-wincore -t tomcat:ibas-wincore ./
+docker pull colorcoding/tomcat:ibas-wincore
+~~~
+* windows nano server
+~~~
+docker build --force-rm --no-cache -f ./dockerfile-winnano -t tomcat:ibas-winnano ./
+docker pull colorcoding/tomcat:ibas-winnano
+~~~
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
