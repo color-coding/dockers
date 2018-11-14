@@ -1,26 +1,12 @@
 # escape=`
-# 基于官方[windows nano server]镜像
-FROM microsoft/nanoserver
+# 基于[windows nano server]镜像
+FROM openjdk:8-jdk-nanoserver
 
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 使用Powershell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue'; "]
-
-# 安装相关组件
-RUN Install-Package NUGet –Force; `
-    Install-Package Microsoft.PowerShell.Archive –Force; `	
-	Import-Module Microsoft.PowerShell.Archive;
-
-# 安装JAVA, jre-8u191-windows-x64
-ENV JAVA_BUNDLEID 235727_2787e4a523244c269598db4e85c51e0c
-ENV JAVA_VERSION jre1.8.0_191
-RUN Invoke-WebRequest -Uri "http://javadl.oracle.com/webapps/download/AutoDL?BundleId=${Env:JAVA_BUNDLEID}" -OutFile 'C:\java-windows-x64.exe'; `
-    Start-Process -FilePath 'C:\java-windows-x64.exe' -ArgumentList "/s" -Wait -NoNewWindow; `
-    Remove-Item -Force -LiteralPath 'C:\java-windows-x64.exe';
-RUN setx /m JRE_HOME \"${Env:ProgramFiles}\JAVA\${Env:JAVA_VERSION}\"
-RUN setx /m PATH $(${Env:PATH} + \";${Env:JRE_HOME}\bin\")
 
 # 安装TOMCAT, v8.5.35
 ENV TOMCAT_VERSION 8.5.35
