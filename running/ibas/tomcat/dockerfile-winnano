@@ -6,7 +6,7 @@ FROM openjdk:8-jdk-nanoserver
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 使用Powershell
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue'; "]
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # 安装TOMCAT, v8.5.35
 ENV TOMCAT_VERSION 8.5.35
@@ -14,11 +14,13 @@ ENV TOMCAT_HOME "C:\apache-tomcat-${TOMCAT_VERSION}"
 RUN Invoke-WebRequest -Uri "http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; `
     Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; `
     Remove-Item -Force -LiteralPath 'C:\apache-tomcat.zip';
-RUN setx /m CATALINA_HOME ${Env:TOMCAT_HOME}
-RUN setx /m PATH $(${Env:PATH} + \";${Env:CATALINA_HOME}\bin\")
+RUN SETX /m CATALINA_HOME ${Env:TOMCAT_HOME};
+RUN SETX /m PATH $(${Env:PATH} + \";${Env:CATALINA_HOME}\bin\");
+RUN New-Item -ItemType "directory" -Path \"${Env:CATALINA_HOME}\ibas_lib\";
 
 # 拷贝配置文件
 COPY conf/* ${TOMCAT_HOME}/conf/
+ADD  webapps.tar ${TOMCAT_HOME}/
 
 # 运行TOMCAT
 EXPOSE 8080

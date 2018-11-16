@@ -23,6 +23,7 @@ RUN set -x \
     && mkdir -p ${CATALINA_HOME}/ibas/data \
     && mkdir -p ${CATALINA_HOME}/ibas/logs \
     && mkdir -p ${CATALINA_HOME}/ibas_tools \
+    && mkdir -p ${CATALINA_HOME}/ibas_lib \
     && rm -rf ${CATALINA_HOME}/webapps \
     && mkdir -p ${CATALINA_HOME}/webapps
 
