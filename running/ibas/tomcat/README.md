@@ -4,10 +4,6 @@ ibas应用的运行环境
 ## 主要内容 | content
 * conf                                tomcat配置
 * ibas/conf                           ibas配置
-* ibas/ibas_tools                     ibas工具
-* deploy_apps.sh                      部署脚本
-* initialize_datastructures.sh        初始化数据库脚本
-* initialize_datas.sh                 注册应用模块脚本
 
 ## 使用说明 | instruction
 * debian

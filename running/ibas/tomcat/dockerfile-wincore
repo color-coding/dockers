@@ -8,8 +8,8 @@ LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 # 使用Powershell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# 安装TOMCAT, v8.5.35
-ENV TOMCAT_VERSION 8.5.35
+# 安装TOMCAT
+ENV TOMCAT_VERSION 8.5.42
 ENV TOMCAT_HOME "C:\apache-tomcat-${TOMCAT_VERSION}"
 RUN Invoke-WebRequest -Uri "http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; `
     Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; `

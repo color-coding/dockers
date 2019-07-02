@@ -1,2 +1,5 @@
 # folder
 /ibas_packages/
+
+# mac files
+.DS_Store
