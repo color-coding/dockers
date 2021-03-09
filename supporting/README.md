@@ -11,6 +11,13 @@ docker run -d \
   sonatype/nexus3
 ~~~
 
+* 创建gofile服务（gost + filebrowser）
+~~~
+docker run -d \
+  --name gofile \
+  -m 256m \
+  colorcoding/gofile
+~~~
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
