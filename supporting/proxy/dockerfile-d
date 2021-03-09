@@ -1,0 +1,13 @@
+# 基于镜像alpine
+FROM ginuerzh/gost
+
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+# 暴露端口
+EXPOSE 80 443
+
+# 执行命令，默认开启debug模式
+ENTRYPOINT ["/bin/gost","-L", "http://:80","-L", "https://:443","-D"]
+
+# docker build --force-rm --no-cache -f ./dockerfile -t gost:http-d ./

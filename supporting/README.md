@@ -11,6 +11,13 @@ docker run -d \
   sonatype/nexus3
 ~~~
 
+* 创建http代理（gost）
+~~~
+docker run -d \
+  --name gost \
+  -m 128m \
+  colorcoding/gost:http
+~~~
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
