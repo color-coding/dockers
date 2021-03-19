@@ -1,9 +1,7 @@
-# 基于镜像alpine
-FROM alpine:latest
-
+# 构建运行环境（alpine）
+FROM alpine:latest as builder
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-
 # 安装环境
 RUN set -x \
 # 更新源
@@ -15,25 +13,45 @@ RUN set -x \
 # 安装NODE
     && apk add --no-cache nodejs nodejs-npm \
 # 安装TYPESCRIPT
-    && npm install -g typescript \
+    && npm install -g typescript@3.9.9 \
 # 安装uglifyjs
     && npm install -g uglify-es \
 # 安装GIT
     && apk add --no-cache git \
-# 安装时区工具
-    && apk add --no-cache tzdata \
 # 删除源
     && rm -rf /var/cache/apk/*
-
 # 环境变量-JAVA目录
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 # 环境变量-MAVEN目录
 ENV MAVEN_HOME /usr/share/java/maven-3
 # 环境变量-代码目录
-ENV CODE_HOME=/home/code
-
+ENV CODE_HOME=/root/codes
 # 初始化环境
 RUN mkdir -p ${CODE_HOME}
-
 # 设置工作目录
 WORKDIR ${CODE_HOME}
+
+# 编译基本项目
+FROM builder as compiler
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+# 获取代码并编译
+RUN set -x \
+    && cd ${CODE_HOME} \
+    && git clone --depth 1 https://github.com/color-coding/ibas-framework.git \
+    && cd ibas-framework \
+    && ./compile_packages.sh
+# 获取代码并编译
+RUN set -x \
+    && cd ${CODE_HOME} \
+    && git clone --depth 1 https://github.com/color-coding/btulz.transforms.git \
+    && cd btulz.transforms \
+    && ./compile_packages.sh
+# 清理ibas相关缓存
+RUN set -x \
+    && rm -rf /root/.m2/repository/org/colorcoding
+
+# 发布镜像
+FROM builder
+# 缓存maven仓库
+COPY --from=compiler /root/.m2 /root/.m2/

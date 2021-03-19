@@ -1,40 +1,58 @@
-# 基于镜像debian
-FROM buildpack-deps:stretch-scm
-
+# 构建运行环境（debain）
+FROM buildpack-deps:stretch-scm as builder
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-
 # 安装环境
 RUN set -x \
-# 安装NODE
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    # 安装NODE
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs \
-# 安装TYPESCRIPT
-    && npm install -g typescript \
-# 安装uglifyjs
+    # 安装TYPESCRIPT
+    && npm install -g typescript@3.9.9 \
+    # 安装uglifyjs
     && npm install -g uglify-es \
-# 安装JDK
+    # 安装JDK
     && apt-get install -y openjdk-8-jdk-headless \
-# 安装MAVEN
+    # 安装MAVEN
     && apt-get install -y maven \
-# 安装转码工具
+    # 安装转码工具
     && apt-get install -y dos2unix \
-# 安装时区工具
-    && apt-get install -y tzdata \
-# 删除源
+    # 删除源
     && apt-get autoremove \
-    && apt-get clean \
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
-
 # 环境变量-JAVA目录
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 # 环境变量-MAVEN目录
 ENV MAVEN_HOME /usr/share/maven
 # 环境变量-代码目录
-ENV CODE_HOME=/home/code
-
+ENV CODE_HOME=/root/codes
 # 初始化环境
 RUN mkdir -p ${CODE_HOME}
-
 # 设置工作目录
 WORKDIR ${CODE_HOME}
+
+# 编译基本项目
+FROM builder as compiler
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+# 获取代码并编译
+RUN set -x \
+    && cd ${CODE_HOME} \
+    && git clone --depth 1 https://github.com/color-coding/ibas-framework.git \
+    && cd ibas-framework \
+    && ./compile_packages.sh
+# 获取代码并编译
+RUN set -x \
+    && cd ${CODE_HOME} \
+    && git clone --depth 1 https://github.com/color-coding/btulz.transforms.git \
+    && cd btulz.transforms \
+    && ./compile_packages.sh
+# 清理ibas相关缓存
+RUN set -x \
+    && rm -rf /root/.m2/repository/org/colorcoding
+
+# 发布镜像
+FROM builder
+# 缓存maven仓库
+COPY --from=compiler /root/.m2 /root/.m2/

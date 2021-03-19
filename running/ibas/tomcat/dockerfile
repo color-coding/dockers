@@ -13,7 +13,8 @@ RUN set -x \
     # 安装字体
     && apt-get install -y fontconfig ttf-dejavu \
     # 删除源
-    && apt-get clean \
+    && apt-get autoremove \
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建数据文件夹
