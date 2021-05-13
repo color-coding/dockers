@@ -1,0 +1,16 @@
+ibas-typescript
+ibas.initialfantasy
+ibas.importexport
+ibas.integration
+ibas.thirdpartyapp
+ibas.barcode
+ibas.documents
+ibas.reportanalysis
+ibas.accounting
+ibas.approvalprocess
+ibas.businesspartner
+ibas.materials
+ibas.purchase
+ibas.sales
+ibas.receiptpayment
+ibas.feedback
