@@ -2,6 +2,8 @@
 FROM alpine:latest as builder
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+# 环境变量-typescript版本
+ENV TS_VERSION 3.9.10
 # 安装环境
 RUN set -x \
 # 更新源
@@ -13,7 +15,7 @@ RUN set -x \
 # 安装NODE
     && apk add --no-cache nodejs nodejs-npm \
 # 安装TYPESCRIPT
-    && npm install -g typescript@3.9.9 \
+    && npm install -g typescript@${TS_VERSION} \
 # 安装uglifyjs
     && npm install -g uglify-es \
 # 安装GIT
