@@ -1,28 +1,37 @@
-# escape=`
 # 基于[windows server core]镜像
-FROM openjdk:8-jdk-windowsservercore
-
-# 维护者
-LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+FROM colorcoding/tomcat:8.5-wincore
 
 # 使用Powershell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# 安装TOMCAT
-ENV TOMCAT_VERSION 8.5.63
-ENV TOMCAT_HOME "C:\apache-tomcat-${TOMCAT_VERSION}"
-RUN Invoke-WebRequest -Uri "http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; `
-    Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; `
-    Remove-Item -Force -LiteralPath 'C:\apache-tomcat.zip';
-RUN SETX /m CATALINA_HOME ${Env:TOMCAT_HOME};
-RUN SETX /m PATH $(${Env:PATH} + \";${Env:CATALINA_HOME}\bin\");
-RUN New-Item -ItemType "directory" -Path \"${Env:CATALINA_HOME}\ibas_lib\";
+# 安装工具
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile 'C:\7zip.msi'; \
+    $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'C:\7zip.msi', '/quiet' -Wait -Passthru; $proc.WaitForExit(); \
+    if ($proc.ExitCode -ne 0) { \
+        Write-Host 'FAILED installing 7-ZIP!'; exit 1; \
+    }; \
+    Remove-Item -Force -LiteralPath 'C:\7zip.msi'; \    
+    SETX /m PATH $(${Env:PATH} + \";${Env:ProgramFiles}\\7-zip\");
+
+# 安装BTULZ
+RUN Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar" -OutFile 'C:\btulz.scripts.tar'; \
+    $proc = Start-Process -FilePath "7z.exe" -ArgumentList 'x', 'C:\btulz.scripts.tar', '-oC:\temp\' -Wait -Passthru; $proc.WaitForExit(); \
+    if ($proc.ExitCode -ne 0) { \
+        Write-Host 'FAILED untar SCRIPTS!'; exit 1; \
+    }; \
+    Copy-Item 'C:\temp\ibas\deploy_apps.bat' \"${Env:CATALINA_HOME}\"; \
+    Copy-Item 'C:\temp\ibas\initialize_apps.bat' \"${Env:CATALINA_HOME}\"; \
+    Remove-Item -Force -LiteralPath 'C:\btulz.scripts.tar'; \
+    Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar" -OutFile 'C:\btulz.transforms.tar'; \
+    $proc = Start-Process -FilePath "7z.exe" -ArgumentList 'x', 'C:\btulz.transforms.tar', '-oC:\temp\ibas_tools' -Wait -Passthru; $proc.WaitForExit(); \
+    if ($proc.ExitCode -ne 0) { \
+        Write-Host 'FAILED untar TRANSFORMS!'; exit 1; \
+    }; \
+    Copy-Item 'C:\temp\ibas_tools' "${Env:CATALINA_HOME}" -Recurse; \
+    Remove-Item -Force -LiteralPath 'C:\btulz.transforms.tar'; \
+    Remove-Item -Force -LiteralPath 'C:\temp\' -Recurse;
 
 # 拷贝配置文件
-COPY conf/* ${TOMCAT_HOME}/conf/
-ADD  webapps.tar ${TOMCAT_HOME}/
-
-# 运行TOMCAT
-EXPOSE 8080
-SHELL ["cmd", "/S", "/C"]
-CMD ["catalina.bat", "run"]
+COPY conf/* ${CATALINA_HOME}/conf/
+COPY ibas/ ${CATALINA_HOME}/ibas/

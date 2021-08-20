@@ -4,7 +4,7 @@ FROM buildpack-deps:stretch-scm as builder
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 环境变量-typescript版本
-ENV TS_VERSION 3.9.10
+ARG TS_VERSION=3.9.10
 # 安装环境
 RUN set -x \
     # 安装NODE

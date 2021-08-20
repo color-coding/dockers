@@ -1,37 +1,42 @@
 # 构建运行环境（alpine）
-FROM alpine:latest as builder
+FROM colorcoding/openjdk:8-jdk-alpine as builder
+
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-# 环境变量-typescript版本
-ENV TS_VERSION 3.9.10
+
 # 安装环境
+RUN apk add --no-cache curl tar unzip git nodejs npm \
+    && rm -rf /var/cache/apk/ \
+    && rm -rf /tmp/*.apk
+
+# 环境变量-typescript版本
+ARG TS_VERSION=3.9.10
+# 安装Node环境
 RUN set -x \
-# 更新源
-    && apk update \
-# 安装JDK
-    && apk add --no-cache openjdk8 \
-# 安装MAVEN
-    && apk add --no-cache maven \
-# 安装NODE
-    && apk add --no-cache nodejs nodejs-npm \
-# 安装TYPESCRIPT
     && npm install -g typescript@${TS_VERSION} \
-# 安装uglifyjs
-    && npm install -g uglify-es \
-# 安装GIT
-    && apk add --no-cache git \
-# 删除源
-    && rm -rf /var/cache/apk/*
-# 环境变量-JAVA目录
-ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-# 环境变量-MAVEN目录
-ENV MAVEN_HOME /usr/share/java/maven-3
+    && npm install -g uglify-es
+
+# 安装Maven
+ARG MAVEN_VERSION=3.8.2
+ARG USER_HOME_DIR="/root"
+ARG SHA=b0bf39460348b2d8eae1c861ced6c3e8a077b6e761fb3d4669be5de09490521a74db294cf031b0775b2dfcd57bd82246e42ce10904063ef8e3806222e686f222
+ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
+
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+    && echo "${SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - \
+    && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+    && rm -f /tmp/apache-maven.tar.gz \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+
+COPY conf/maven.settings.xml ${MAVEN_HOME}/conf/settings.xml
+
 # 环境变量-代码目录
 ENV CODE_HOME=/root/codes
-# 初始化环境
 RUN mkdir -p ${CODE_HOME}
-# 设置工作目录
-WORKDIR ${CODE_HOME}
 
 # 编译基本项目
 FROM builder as compiler
@@ -51,9 +56,10 @@ RUN set -x \
     && ./compile_packages.sh
 # 清理ibas相关缓存
 RUN set -x \
-    && rm -rf /root/.m2/repository/org/colorcoding
+    && rm -rf ${MAVEN_CONFIG}/repository/org/colorcoding
 
 # 发布镜像
 FROM builder
 # 缓存maven仓库
-COPY --from=compiler /root/.m2 /root/.m2/
+COPY --from=compiler ${MAVEN_CONFIG} ${MAVEN_CONFIG}
+WORKDIR ${CODE_HOME}

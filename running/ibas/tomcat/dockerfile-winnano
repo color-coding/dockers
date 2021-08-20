@@ -1,28 +1,16 @@
-# escape=`
 # 基于[windows nano server]镜像
-FROM openjdk:8-jdk-nanoserver
+FROM colorcoding/tomcat:ibas-wincore as installer
 
-# 维护者
-LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+# 拷贝tomcat文件
+FROM colorcoding/tomcat:8.5-winnano
 
-# 使用Powershell
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+COPY conf/* ${CATALINA_HOME}/conf/
+COPY ibas/ ${CATALINA_HOME}/ibas/
 
-# 安装TOMCAT
-ENV TOMCAT_VERSION 8.5.63
-ENV TOMCAT_HOME "C:\apache-tomcat-${TOMCAT_VERSION}"
-RUN Invoke-WebRequest -Uri "http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; `
-    Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; `
-    Remove-Item -Force -LiteralPath 'C:\apache-tomcat.zip';
-RUN SETX /m CATALINA_HOME ${Env:TOMCAT_HOME};
-RUN SETX /m PATH $(${Env:PATH} + \";${Env:CATALINA_HOME}\bin\");
-RUN New-Item -ItemType "directory" -Path \"${Env:CATALINA_HOME}\ibas_lib\";
+ENV PATH="${PATH};${ProgramFiles}/7-zip/"
 
-# 拷贝配置文件
-COPY conf/* ${TOMCAT_HOME}/conf/
-ADD  webapps.tar ${TOMCAT_HOME}/
-
-# 运行TOMCAT
-EXPOSE 8080
-SHELL ["cmd", "/S", "/C"]
-CMD ["catalina.bat", "run"]
+COPY --from=installer ["${ProgramFiles}/7-zip/7z.exe", "${ProgramFiles}/7-zip/7z.exe"]
+COPY --from=installer ["${ProgramFiles}/7-zip/7z.dll", "${ProgramFiles}/7-zip/7z.dll"]
+COPY --from=installer ["${CATALINA_HOME}/deploy_apps.bat", "${CATALINA_HOME}/deploy_apps.bat"]
+COPY --from=installer ["${CATALINA_HOME}/initialize_apps.bat", "${CATALINA_HOME}/initialize_apps.bat"]
+COPY --from=installer ["${CATALINA_HOME}/ibas_tools", "${CATALINA_HOME}/ibas_tools"]

@@ -7,17 +7,6 @@ LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 # 工具版本
 ARG TEE_VERSION=14.123.1
 
-# 更新环境
-RUN set -x \
-# 更新源
-    && apk update \
-# 安装CURL
-    && apk add --no-cache curl \
-# 安装UNZIP
-    && apk add --no-cache unzip \
-# 删除源
-    && rm -rf /var/cache/apk/*
-
 # 安装工具
 RUN set -x \
 # 下载TEE

@@ -4,17 +4,6 @@ FROM colorcoding/compiling:ibas-alpine
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
-# 更新环境
-RUN set -x \
-# 更新源
-    && apk update \
-# 安装CURL
-    && apk add --no-cache curl \
-# 安装UNZIP
-    && apk add --no-cache unzip \
-# 删除源
-    && rm -rf /var/cache/apk/*
-
 # 工具版本
 ARG GIT_TF_VERSION=2.0.3.20131219
 
