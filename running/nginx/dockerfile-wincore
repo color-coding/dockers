@@ -1,0 +1,18 @@
+# 基于[windows nano server]镜像
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ARG NGINX_VERSION=1.21.1
+
+ENV NGINX_HOME C:\\nginx
+
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest -Uri https://nginx.org/download/nginx-${Env:NGINX_VERSION}.zip -O nginx.zip; \
+    Expand-Archive -LiteralPath nginx.zip -DestinationPath 'C:\'; \
+    Move-Item -Path ${Env:NGINX_HOME}-${Env:NGINX_VERSION} ${Env:NGINX_HOME}; \
+    Remove-Item nginx.zip -Force;
+
+WORKDIR ${NGINX_HOME}
+ENTRYPOINT ["nginx.exe"]
+EXPOSE 80 443

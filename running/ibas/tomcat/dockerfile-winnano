@@ -4,9 +4,6 @@ FROM colorcoding/tomcat:ibas-wincore as installer
 # 拷贝tomcat文件
 FROM colorcoding/tomcat:8.5-winnano
 
-COPY conf/* ${CATALINA_HOME}/conf/
-COPY ibas/ ${CATALINA_HOME}/ibas/
-
 ENV PATH="${PATH};${ProgramFiles}/7-zip/"
 
 COPY --from=installer ["${ProgramFiles}/7-zip/7z.exe", "${ProgramFiles}/7-zip/7z.exe"]
@@ -14,3 +11,6 @@ COPY --from=installer ["${ProgramFiles}/7-zip/7z.dll", "${ProgramFiles}/7-zip/7z
 COPY --from=installer ["${CATALINA_HOME}/deploy_apps.bat", "${CATALINA_HOME}/deploy_apps.bat"]
 COPY --from=installer ["${CATALINA_HOME}/initialize_apps.bat", "${CATALINA_HOME}/initialize_apps.bat"]
 COPY --from=installer ["${CATALINA_HOME}/ibas_tools", "${CATALINA_HOME}/ibas_tools"]
+
+COPY conf/* ${CATALINA_HOME}/conf/
+# COPY ibas/ ${CATALINA_HOME}/ibas/ 挂载非空目录报错
