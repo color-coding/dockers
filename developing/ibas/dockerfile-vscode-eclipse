@@ -5,12 +5,6 @@ FROM colorcoding/developing:ibas
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 安装开发工具
-# 前端工具-VS Code
-ARG VS_CODE_URL=https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
-RUN set -x \
-    && curl -o vscode.deb -L ${VS_CODE_URL} \
-    && dpkg -i vscode.deb \
-    && rm -rf vscode.deb
 # 后端工具-Eclipse
 ARG ECLIPSE_URL=https://mirrors.ustc.edu.cn/eclipse/technology/epp/downloads/release/2021-06/R/eclipse-jee-2021-06-R-linux-gtk-x86_64.tar.gz
 RUN set -x \
@@ -25,13 +19,31 @@ RUN set -x \
     && echo "Terminal=false"                     >>/usr/share/applications/eclipse.desktop \
     && echo "Type=Application"                   >>/usr/share/applications/eclipse.desktop \
     && echo "Categories=Development;IDE;"        >>/usr/share/applications/eclipse.desktop \
-    && echo "StartupNotify=true"                 >>/usr/share/applications/eclipse.desktop
+    && echo "StartupNotify=false"                >>/usr/share/applications/eclipse.desktop
 
 # 后端工具-Tomcat
-ARG TOMCAT_URL=https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.68/bin/apache-tomcat-8.5.68.zip
+ARG TOMCAT_URL=https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.70/bin/apache-tomcat-8.5.70.zip
 RUN set -x \
     && curl -o apache-tomcat.zip -L ${TOMCAT_URL} \
-    && mkdir -p ${CODE_HOME}/../tools \
-    && unzip -o apache-tomcat.zip -d ${CODE_HOME}/../tools \
+    && mkdir -p ${CODE_HOME}/../workspaces \
+    && unzip -o apache-tomcat.zip -d ${CODE_HOME}/../workspaces \
     && rm -rf apache-tomcat.zip
+
+# 前端工具-VS Code
+ARG VS_CODE_URL=https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+RUN set -x \
+    && curl -o vscode.deb -L ${VS_CODE_URL} \
+    && dpkg -i vscode.deb \
+    && rm -rf vscode.deb \
+    && mkdir -p /root/.local/share/applications/ \
+    && echo "[Desktop Entry]"                               >/root/.local/share/applications/code.desktop \
+    && echo "Name=Visual Studio Code"                       >>/root/.local/share/applications/code.desktop \
+    && echo "Comment=Code Editing. Redefined."              >>/root/.local/share/applications/code.desktop \
+    && echo "Exec=/usr/share/code/code --no-sandbox --user-data-dir=/root/.vscode --unity-launch %F"    >>/root/.local/share/applications/code.desktop \
+    && echo "Icon=com.visualstudio.code"                    >>/root/.local/share/applications/code.desktop \
+    && echo "Type=Application"                              >>/root/.local/share/applications/code.desktop \
+    && echo "Terminal=false"                                >>/root/.local/share/applications/code.desktop \
+    && echo "StartupNotify=false"                           >>/root/.local/share/applications/code.desktop \
+    && echo "StartupWMClass=Code"                           >>/root/.local/share/applications/code.desktop \
+    && echo "Categories=Development;IDE;"                   >>/root/.local/share/applications/code.desktop
 

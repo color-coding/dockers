@@ -1,5 +1,5 @@
 # developing:ibas
-ibas应用的开发环境
+ibas应用的开发环境，带桌面
 
 ## 主要内容 | content
 * git
@@ -10,15 +10,13 @@ ibas应用的开发环境
 * vscode, eclipse (dockerfile-vscode-eclipse)
 
 ## 使用说明 | instruction
-* environment
+* colorcoding/developing:ibas
 ~~~
-docker build --force-rm --no-cache -f ./dockerfile -t developing:ibas ./
-docker pull colorcoding/developing:ibas
+docker build --force-rm -f ./dockerfile -t colorcoding/developing:ibas ./
 ~~~
-* vscode, eclipse
+* developing:ibas-vscode-eclipse （vscode, eclipse）
 ~~~
-docker build --force-rm --no-cache -f ./dockerfile-vscode-eclipse -t developing:ibas-vscode-eclipse ./
-docker pull colorcoding/developing:ibas-vscode-eclipse
+docker build --force-rm -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas-vscode-eclipse ./
 docker run -p 80:80 -e HTTP_PASSWORD=1q2w3e colorcoding/developing:ibas-vscode-eclipse
 ~~~
 

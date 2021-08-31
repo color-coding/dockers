@@ -1,5 +1,12 @@
+# file
+~*
+*_log_*.txt
+*.tmp
+*.tar
+*.zip
+
 # folder
-/ibas_packages/
+ibas_packages/
 
 # mac files
 .DS_Store

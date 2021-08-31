@@ -1,34 +1,26 @@
 # 基于镜像ubuntu
-FROM dorowu/ubuntu-desktop-lxde-vnc as builder
+FROM dorowu/ubuntu-desktop-lxde-vnc:latest as builder
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 # 安装环境
 RUN set -x \
-    # 安装基本
     && apt-get update \
+    # 安装基本
     && apt-get install -y gnupg libgconf-2-4 \
+    # 安装JDK
+    && apt-get install -y openjdk-8-jdk maven \
+    && apt-get purge -y openjdk-11* \
     # 安装NODE
     && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs \
     # 安装TYPESCRIPT
-    && npm install -g typescript@3.9.9 \
+    && npm install -g typescript@3.9.10 \
     # 安装uglifyjs
     && npm install -g uglify-es \
-    # 安装tslint
-    && npm install -g tslint \
-    # 安装JDK
-    && apt-get install -y openjdk-8-jdk \
-    # 安装MAVEN
-    && apt-get install -y maven \
-    # 安装git
-    && apt-get install -y git \
-    # 安装转码工具
-    && apt-get install -y dos2unix \
-    # 安装解压工具
-    && apt-get install -y unzip \
-    && apt-get install -y unrar \
+    # 安装其他工具
+    && apt-get install -y git dos2unix unzip unrar fcitx-googlepinyin aria2 uget \
     # 删除源
-    && apt-get autoremove \
+    && apt-get autoremove -y \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
 # 环境变量-JAVA目录
@@ -49,24 +41,21 @@ RUN set -x \
 # 设置环境变量
 ENV GITTF_HOME /usr/share/git-tf-${GIT_TF_VERSION}/
 
-# 安装tfs代码获取工具
-ARG TEE_VERSION=14.123.1
-RUN set -x \
-    # 下载TEE
-    && curl -L https://github.com/Microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip -O \
-    # 解压安装
-    && unzip -o TEE-CLC-${TEE_VERSION}.zip -d /usr/share/ \
-    && ln -s /usr/share/TEE-CLC-${TEE_VERSION}/tf /usr/bin/tf \
-    # 删除文件
-    && rm -rf ./TEE-CLC-${TEE_VERSION}.zip
-# 设置环境变量
-ENV TF_CLC_HOME /usr/share/TEE-CLC-${TEE_VERSION}/
-
 # 环境变量-代码目录
 ENV CODE_HOME=/root/codes
 # 初始化环境
 RUN mkdir -p ${CODE_HOME}
 
+# 移除不用文件
+RUN set -x \
+    # 移除chrome
+    && apt-get purge -y google-chrome-stable \
+    && rm -rf /usr/share/applications/chromium-browser-sound.desktop \
+    && rm -rf /usr/local/bin/chromium-browser-sound.sh \
+    # 删除源
+    && apt-get autoremove -y \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/*
 
 # 编译基本项目
 FROM builder as compiler

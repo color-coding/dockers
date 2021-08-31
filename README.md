@@ -1,39 +1,18 @@
 # dockers
-配置好的相关docker镜像
+相关docker镜像
 
-### 编译环境 | compiling
-* debian
-~~~
-docker pull colorcoding/compiling:ibas
-docker pull colorcoding/compiling:ibas-tee
-~~~
-* alpine
-~~~
-docker pull colorcoding/compiling:ibas-alpine
-docker pull colorcoding/compiling:ibas-tee-alpine
-~~~
+## 编译 | compiling
+* [详细说明](./compiling/ibas/README.md)
 
-### 运行环境 | running
-* debian
-~~~
-docker pull colorcoding/tomcat:ibas
-docker pull colorcoding/nginx:ibas
-~~~
-* alpine
-~~~
-docker pull colorcoding/tomcat:ibas-alpine
-docker pull colorcoding/nginx:ibas-alpine
-~~~
+## 开发 | developing
+* [详细说明](./developing/ibas/README.md)
 
-### 开发环境 | developing
-* ibas
-~~~
-docker pull colorcoding/developing:ibas
-docker pull colorcoding/developing:ibas-vscode-eclipse
-~~~
-
-### 支持环境 | supporting
-* docker pull sonatype/nexus3
+## 运行 | running
+* [详细说明：OpenJDK](./running/openjdk/README.md)
+* [详细说明：Tomcat](./running/tomcat/README.md)
+* [详细说明：Nginx](./running/nginx/README.md)
+* [详细说明：ibas nginx](./running/ibas/nginx/README.md)
+* [详细说明：ibas tomcat](./running/ibas/tomcat/README.md)
 
 ### 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
