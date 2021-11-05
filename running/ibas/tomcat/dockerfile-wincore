@@ -8,7 +8,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile 'C:\7zip.msi'; \
     $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'C:\7zip.msi', '/quiet' -Wait -Passthru; $proc.WaitForExit(); \
-    if ($proc.ExitCode -ne 0) { \
+    IF ($proc.ExitCode -ne 0) { \
         Write-Host 'FAILED installing 7-ZIP!'; exit 1; \
     }; \
     Remove-Item -Force -LiteralPath 'C:\7zip.msi'; \    
@@ -17,7 +17,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 # 安装BTULZ
 RUN Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar" -OutFile 'C:\btulz.scripts.tar'; \
     $proc = Start-Process -FilePath "7z.exe" -ArgumentList 'x', 'C:\btulz.scripts.tar', '-oC:\temp\' -Wait -Passthru; $proc.WaitForExit(); \
-    if ($proc.ExitCode -ne 0) { \
+    IF ($proc.ExitCode -ne 0) { \
         Write-Host 'FAILED untar SCRIPTS!'; exit 1; \
     }; \
     Copy-Item 'C:\temp\ibas\deploy_apps.bat' \"${Env:CATALINA_HOME}\"; \
@@ -25,7 +25,7 @@ RUN Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releas
     Remove-Item -Force -LiteralPath 'C:\btulz.scripts.tar'; \
     Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar" -OutFile 'C:\btulz.transforms.tar'; \
     $proc = Start-Process -FilePath "7z.exe" -ArgumentList 'x', 'C:\btulz.transforms.tar', '-oC:\temp\ibas_tools' -Wait -Passthru; $proc.WaitForExit(); \
-    if ($proc.ExitCode -ne 0) { \
+    IF ($proc.ExitCode -ne 0) { \
         Write-Host 'FAILED untar TRANSFORMS!'; exit 1; \
     }; \
     Copy-Item 'C:\temp\ibas_tools' "${Env:CATALINA_HOME}" -Recurse; \

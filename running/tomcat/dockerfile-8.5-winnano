@@ -1,28 +1,5 @@
 # 基于[windows nano server]镜像
-FROM colorcoding/openjdk:8-jdk-wincore as installer
-
-# 维护者
-LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-
-# 使用Powershell
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-
-# 安装TOMCAT
-ARG TOMCAT_MAJOR=8
-ARG TOMCAT_VERSION=8.5.71
-ARG TOMCAT_SHA512=292a3f856b0a8c1d11fd1ba252cabd94794201cda4f951dd0522764449bed90f2f43a4a667cd6d28ce13c3b2096736978d9df91709c168ba7133c51544446433
-
-ENV CATALINA_HOME C:\\apache-tomcat
-
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
-    Invoke-WebRequest -Uri "https://www.apache.org/dyn/closer.cgi?action=download`&filename=tomcat/tomcat-${Env:TOMCAT_MAJOR}/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; \
-    if ((Get-FileHash 'C:\apache-tomcat.zip' -Algorithm sha512).Hash -ne ${Env:TOMCAT_SHA512}) { \
-        Write-Host 'Verifying sha512 FAILED!'; exit 1; \
-    }; \
-    Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; \
-    Move-Item -Path ${Env:CATALINA_HOME}-${Env:TOMCAT_VERSION} ${Env:CATALINA_HOME}; \
-    Remove-Item -Force -LiteralPath 'C:\apache-tomcat.zip'; \
-    SETX /m PATH $(${Env:PATH} + \";${Env:CATALINA_HOME}\bin\");
+FROM colorcoding/tomcat:8.5-wincore as installer
 
 # 拷贝tomcat文件
 FROM colorcoding/openjdk:8-jdk-winnano

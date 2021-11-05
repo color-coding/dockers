@@ -7,16 +7,28 @@ LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 # 使用Powershell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+# 安装证书（系统根证书已到期）
+# https://letsencrypt.org/certs/isrgrootx1.der
+# https://letsencrypt.org/certs/isrg-root-x2.der
+# https://letsencrypt.org/certs/lets-encrypt-r3.der
+COPY certs C:\\Certs
+RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
+        IF($_ -is [System.IO.FileInfo]) { \
+            Import-Certificate -FilePath $_.FullName -CertStoreLocation 'Cert:\LocalMachine\Root' ; \
+        } \
+    }; \
+    Remove-Item -Force -Recurse -LiteralPath 'C:\Certs\';
+
 # 安装TOMCAT
 ARG TOMCAT_MAJOR=8
-ARG TOMCAT_VERSION=8.5.71
-ARG TOMCAT_SHA512=292a3f856b0a8c1d11fd1ba252cabd94794201cda4f951dd0522764449bed90f2f43a4a667cd6d28ce13c3b2096736978d9df91709c168ba7133c51544446433
+ARG TOMCAT_VERSION=8.5.72
+ARG TOMCAT_SHA512=05a732b0787bd1a63fa718ec2f137f1899f1a1630ca65aa2cd4e1afdf0133cc4d3403070888ea6d0172e4f7d61ac132be109f22f78686b0df01d7ffa50e2a984
 
 ENV CATALINA_HOME C:\\apache-tomcat
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri "https://www.apache.org/dyn/closer.cgi?action=download`&filename=tomcat/tomcat-${Env:TOMCAT_MAJOR}/v${Env:TOMCAT_VERSION}/bin/apache-tomcat-${Env:TOMCAT_VERSION}-windows-x64.zip" -OutFile 'C:\apache-tomcat.zip'; \
-    if ((Get-FileHash 'C:\apache-tomcat.zip' -Algorithm sha512).Hash -ne ${Env:TOMCAT_SHA512}) { \
+    IF ((Get-FileHash 'C:\apache-tomcat.zip' -Algorithm sha512).Hash -ne ${Env:TOMCAT_SHA512}) { \
         Write-Host 'Verifying sha512 FAILED!'; exit 1; \
     }; \
     Expand-Archive -LiteralPath 'C:\apache-tomcat.zip' -DestinationPath 'C:\'; \

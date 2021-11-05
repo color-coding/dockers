@@ -8,6 +8,7 @@ docker build --force-rm -f ./dockerfile-8.5-alpine -t colorcoding/tomcat:8.5-alp
 ~~~
 * tomcat:8.5-wincore
 ~~~
+# certs目录为证书，脚本会自动注册
 docker build --force-rm -f ./dockerfile-8.5-wincore -t colorcoding/tomcat:8.5-wincore ./
 ~~~
 * tomcat:8.5-winnano

@@ -7,6 +7,7 @@
 
 # folder
 ibas_packages/
+certs/
 
 # mac files
 .DS_Store

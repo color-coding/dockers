@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551_zh-cn
 
 # $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
@@ -26,18 +26,18 @@ ARG OPENJDK_URL=https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/downl
 ARG OPENJDK_SHA256=49e59ddbf8d9bcffbfe7c02bc4911ccc44b2426db4f4f02a3c13c3c0dadc28df
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
-    if ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \
-            Write-Host 'Verifying sha256 FAILED!'; exit 1; \
+    IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \
+    Write-Host 'Verifying sha256 FAILED!'; exit 1; \
     }; \
     New-Item -ItemType Directory -Path C:\temp | Out-Null; \
     Write-Host 'Installing using MSI ...'; \
     $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'openjdk.msi', '/L*V', 'C:\temp\OpenJDK.log', \
     '/quiet', 'ADDLOCAL=FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome' -Wait -Passthru; \
     $proc.WaitForExit() ; \
-    if ($proc.ExitCode -ne 0) { \
+    IF ($proc.ExitCode -ne 0) { \
     Write-Host 'FAILED installing MSI!' ; exit 1; \
     }; \
     Remove-Item -Path C:\temp -Force -Recurse | Out-Null; \
     Remove-Item openjdk.msi -Force;
 
-ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,readonly,nonFatal"
+ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,readonly,nonFatal"
