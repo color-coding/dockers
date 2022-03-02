@@ -16,17 +16,22 @@
   limitations under the License.
 -->
 <!-- The contents of this file will be loaded for each web application -->
-<Context>
+<!-- org.apache.jasper.servlet.JasperInitializer disable jsp scan -->
+<!-- org.apache.tomcat.websocket.server.WsSci disable websocket -->
+<Context containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
 
-    <!-- allow symbolic links -->
-    <Resources allowLinking="true" />
-    <!-- Default set of monitored resources. If one of these changes, the    -->
-    <!-- web application will be reloaded.                                   -->
-    <WatchedResource>WEB-INF/web.xml</WatchedResource>
-    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-
-    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
-    <!--
+  <!-- allow symbolic links -->
+  <Resources allowLinking="true" />
+  <!-- Default set of monitored resources. If one of these changes, the    -->
+  <!-- web application will be reloaded.                                   -->
+  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+  <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+  <!-- disable tld scan -->
+  <JarScanner>
+    <JarScanFilter defaultTldScan="false" />
+  </JarScanner>
+  <!-- Uncomment this to disable session persistence across Tomcat restarts -->
+  <!--
     <Manager pathname="" />
-    -->
+  -->
 </Context>
