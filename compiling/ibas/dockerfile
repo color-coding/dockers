@@ -28,6 +28,7 @@ RUN set -x \
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 # 环境变量-MAVEN目录
 ENV MAVEN_HOME /usr/share/maven
+COPY conf/maven.settings.xml ${MAVEN_HOME}/conf/settings.xml
 # 环境变量-代码目录
 ENV CODE_HOME=/root/codes
 # 初始化环境

@@ -1,5 +1,14 @@
-# 基于[windows server core]镜像
+# 基于[windows nano server]镜像
 FROM colorcoding/nginx:wincore
 
-# 拷贝配置文件
-COPY conf/win.nginx.conf C:/nginx/conf/nginx.conf
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+# 安装工具
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z2201-x64.msi" -OutFile 'C:\7zip.msi'; \
+    $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'C:\7zip.msi', '/quiet' -Wait -Passthru; $proc.WaitForExit(); \
+    IF ($proc.ExitCode -ne 0) { \
+    Write-Host 'FAILED installing 7-ZIP!'; exit 1; \
+    }; \
+    Remove-Item -Force -LiteralPath 'C:\7zip.msi'; \    
+    SETX /m PATH $(${Env:PATH} + \";${Env:ProgramFiles}\\7-zip\");
