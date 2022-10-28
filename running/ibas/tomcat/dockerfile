@@ -28,7 +28,10 @@ RUN set -x \
 # 下载并部署工具
 RUN set -x \
     && curl -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
-    && tar -xvf /tmp/btulz.transforms.tar -C ${CATALINA_HOME}/ibas_tools \
+    && mkdir -p /tmp/btulz.transforms \
+    && tar -xvf /tmp/btulz.transforms.tar -C /tmp/btulz.transforms \
+    && rm -rf /tmp/btulz.transforms/._* \
+    && cp -f /tmp/btulz.transforms/*.jar ${CATALINA_HOME}/ibas_tools/ \
     && rm -f /tmp/btulz.transforms.tar \
     && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
     && mkdir -p /tmp/btulz.scripts \
@@ -36,6 +39,8 @@ RUN set -x \
     && rm -f /tmp/btulz.scripts.tar \
     && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh \
     && cp -f /tmp/btulz.scripts/ibas/initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh \
+    && cp -f /tmp/btulz.scripts/ibas/update_db.sh ${CATALINA_HOME}/update_db.sh \
+    && cp -f /tmp/btulz.scripts/ibas/update_routing.sh ${CATALINA_HOME}/update_routing.sh \
     && rm -rf /tmp/btulz.scripts
 
 # 拷贝配置文件
