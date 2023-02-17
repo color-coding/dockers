@@ -4,9 +4,6 @@
 ## 编译 | compiling
 * [详细说明](./compiling/ibas/README.md)
 
-## 开发 | developing
-* [详细说明](./developing/ibas/README.md)
-
 ## 运行 | running
 * [详细说明：OpenJDK](./running/openjdk/README.md)
 * [详细说明：Tomcat](./running/tomcat/README.md)

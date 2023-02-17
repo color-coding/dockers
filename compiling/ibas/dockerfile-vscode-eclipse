@@ -1,32 +1,152 @@
 # 基于镜像ubuntu
-FROM dorowu/ubuntu-desktop-lxde-vnc:latest as builder
+FROM accetto/ubuntu-vnc-xfce-firefox-g3:20.04
+
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-# 安装环境
+
+# 切换root用户
+USER 0
+
+# 安装JDK 8
+# https://github.com/AdoptOpenJDK/openjdk-docker/blob/master/8/jdk/ubuntu/Dockerfile.openj9.releases.full
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata curl ca-certificates fontconfig locales \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_VERSION jdk8u292-b10_openj9-0.26.0
+
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "${ARCH}" in \
+    ppc64el|ppc64le) \
+    ESUM='bc88be757a884b90a2bb91365b7e922c0e7d0fea991cd69d1f74c59b2257a4b5'; \
+    BINARY_URL='https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_ppc64le_linux_openj9_8u292b10_openj9-0.26.0.tar.gz'; \
+    ;; \
+    s390x) \
+    ESUM='7aff99f87482d5bb0969f13cddecfb600e755d428ae14f4292d08d4a1ea5f080'; \
+    BINARY_URL='https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_s390x_linux_openj9_8u292b10_openj9-0.26.0.tar.gz'; \
+    ;; \
+    amd64|x86_64) \
+    ESUM='06d6c9421778575cf59d50f69b7ac6a7bb237485b3a3c2f89cfb61a056c7b2de'; \
+    BINARY_URL='https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_x64_linux_openj9_8u292b10_openj9-0.26.0.tar.gz'; \
+    ;; \
+    *) \
+    echo "Unsupported arch: ${ARCH}"; \
+    exit 1; \
+    ;; \
+    esac; \
+    curl -LfsSo /tmp/openjdk.tar.gz ${BINARY_URL}; \
+    echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; \
+    mkdir -p /opt/java/openjdk; \
+    cd /opt/java/openjdk; \
+    tar -xf /tmp/openjdk.tar.gz --strip-components=1; \
+    rm -rf /tmp/openjdk.tar.gz;
+
+ENV JAVA_HOME=/opt/java/openjdk \
+    PATH="/opt/java/openjdk/bin:$PATH"
+ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,readonly,nonFatal"
+
+# Create OpenJ9 SharedClassCache (SCC) for bootclasses to improve the java startup.
+# Downloads and runs tomcat to generate SCC for bootclasses at /opt/java/.scc/openj9_system_scc
+# Does a dry-run and calculates the optimal cache size and recreates the cache with the appropriate size.
+# With SCC, OpenJ9 startup is improved ~50% with an increase in image size of ~14MB
+# Application classes can be create a separate cache layer with this as the base for further startup improvement
+
+RUN set -eux; \
+    unset OPENJ9_JAVA_OPTIONS; \
+    SCC_SIZE="50m"; \
+    DOWNLOAD_PATH_TOMCAT=/tmp/tomcat; \
+    INSTALL_PATH_TOMCAT=/opt/tomcat-home; \
+    TOMCAT_CHECKSUM="0db27185d9fc3174f2c670f814df3dda8a008b89d1a38a5d96cbbe119767ebfb1cf0bce956b27954aee9be19c4a7b91f2579d967932207976322033a86075f98"; \
+    TOMCAT_DWNLD_URL="https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.35/bin/apache-tomcat-9.0.35.tar.gz"; \
+    \
+    mkdir -p "${DOWNLOAD_PATH_TOMCAT}" "${INSTALL_PATH_TOMCAT}"; \
+    curl -LfsSo "${DOWNLOAD_PATH_TOMCAT}"/tomcat.tar.gz "${TOMCAT_DWNLD_URL}"; \
+    echo "${TOMCAT_CHECKSUM} *${DOWNLOAD_PATH_TOMCAT}/tomcat.tar.gz" | sha512sum -c -; \
+    tar -xf "${DOWNLOAD_PATH_TOMCAT}"/tomcat.tar.gz -C "${INSTALL_PATH_TOMCAT}" --strip-components=1; \
+    rm -rf "${DOWNLOAD_PATH_TOMCAT}"; \
+    \
+    java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version; \
+    export OPENJ9_JAVA_OPTIONS="-Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal"; \
+    "${INSTALL_PATH_TOMCAT}"/bin/startup.sh; \
+    sleep 5; \
+    "${INSTALL_PATH_TOMCAT}"/bin/shutdown.sh -force; \
+    sleep 15; \
+    FULL=$( (java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,printallStats 2>&1 || true) | awk '/^Cache is [0-9.]*% .*full/ {print substr($3, 1, length($3)-1)}'); \
+    DST_CACHE=$(java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,destroy 2>&1 || true); \
+    SCC_SIZE=$(echo $SCC_SIZE | sed 's/.$//'); \
+    SCC_SIZE=$(awk "BEGIN {print int($SCC_SIZE * $FULL / 100.0)}"); \
+    [ "${SCC_SIZE}" -eq 0 ] && SCC_SIZE=1; \
+    SCC_SIZE="${SCC_SIZE}m"; \
+    java -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version; \
+    unset OPENJ9_JAVA_OPTIONS; \
+    \
+    export OPENJ9_JAVA_OPTIONS="-Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal"; \
+    "${INSTALL_PATH_TOMCAT}"/bin/startup.sh; \
+    sleep 5; \
+    "${INSTALL_PATH_TOMCAT}"/bin/shutdown.sh -force; \
+    sleep 5; \
+    FULL=$( (java -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,printallStats 2>&1 || true) | awk '/^Cache is [0-9.]*% .*full/ {print substr($3, 1, length($3)-1)}'); \
+    echo "SCC layer is $FULL% full."; \
+    rm -rf "${INSTALL_PATH_TOMCAT}"; \
+    if [ -d "/opt/java/.scc" ]; then \
+    chmod -R 0777 /opt/java/.scc; \
+    fi; \
+    \
+    echo "SCC generation phase completed";
+
+# 安装Maven
+ARG MAVEN_VERSION=3.8.7
+ARG SHA=21c2be0a180a326353e8f6d12289f74bc7cd53080305f05358936f3a1b6dd4d91203f4cc799e81761cf5c53c5bbe9dcc13bdb27ec8f57ecf21b2f9ceec3c8d27
+ARG BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+    && echo "${SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - \
+    && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+    && rm -f /tmp/apache-maven.tar.gz \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME /usr/share/maven
+
+COPY conf/maven.settings.xml ${MAVEN_HOME}/conf/settings.xml
+
+# 安装其他工具
 RUN set -x \
-    # 修改源公钥
-    && curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    # 安装NODE
-    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get update \
-    && apt-get install -y nodejs \
-    && npm install -g typescript@3.9.10 uglify-es \
-    # 安装基本
-    && apt-get install -y gnupg libgconf-2-4 git dos2unix \
-    # 安装JDK
-    && apt-get install -y openjdk-8-jdk \
-    && apt-get install -y maven \
-    # 安装其他工具
-    && apt-get install -y fcitx-googlepinyin \
+    && apt-get install -y --no-install-recommends \
+    unzip dos2unix \
+    ttf-wqy-microhei \
+    git \
+    nodejs npm \
+    # vscode依赖
+    gnupg libgconf-2-4 libxss1 libsecret-1-0 libnss3 \
     # 删除源
     && apt-get autoremove -y \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
-# 环境变量-JAVA目录
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-# 环境变量-MAVEN目录
-ENV MAVEN_HOME /usr/share/maven
-COPY conf/maven.settings.xml ${MAVEN_HOME}/conf/settings.xml
+
+RUN set -x \
+    && npm install -g typescript@3.9.10 uglify-es 
+
+# vscode
+RUN curl -LfsSo /tmp/vscode_amd64.deb 'https://vscode.cdn.azure.cn/stable/a0479759d6e9ea56afa657e454193f72aef85bd0/code_1.48.2-1598353430_amd64.deb' \
+    && dpkg -i /tmp/vscode_amd64.deb \
+    && rm -rf /tmp/vscode_amd64.deb \
+    && echo '[Desktop Entry]'                               >/usr/share/applications/code.desktop \
+    && echo 'Name=Visual Studio Code'                       >>/usr/share/applications/code.desktop \
+    && echo 'Comment=Code Editing. Redefined.'              >>/usr/share/applications/code.desktop \
+    && echo 'Exec=/usr/share/code/code --no-sandbox --unity-launch %F'    >>/usr/share/applications/code.desktop \
+    && echo 'Icon=com.visualstudio.code'                    >>/usr/share/applications/code.desktop \
+    && echo 'Type=Application'                              >>/usr/share/applications/code.desktop \
+    && echo 'Terminal=false'                                >>/usr/share/applications/code.desktop \
+    && echo 'StartupNotify=false'                           >>/usr/share/applications/code.desktop \
+    && echo 'StartupWMClass=Code'                           >>/usr/share/applications/code.desktop \
+    && echo 'Categories=Development;IDE;'                   >>/usr/share/applications/code.desktop
 
 # eclipse jee
 RUN curl -LfsSo /tmp/eclipse.tar.gz 'https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2020-06/R/eclipse-jee-2020-06-R-linux-gtk-x86_64.tar.gz' \
@@ -34,28 +154,15 @@ RUN curl -LfsSo /tmp/eclipse.tar.gz 'https://www.eclipse.org/downloads/download.
     && cd /usr/share/eclipse \
     && tar -xf /tmp/eclipse.tar.gz --strip-components=1 \
     && rm -rf /tmp/eclipse.tar.gz \
-    && echo "[Desktop Entry]"                    >/usr/share/applications/eclipse.desktop \
-    && echo "Name=Eclipse"                       >>/usr/share/applications/eclipse.desktop \
-    && echo "Comment=Eclipse"                    >>/usr/share/applications/eclipse.desktop \
-    && echo "Exec=/usr/share/eclipse/eclipse"    >>/usr/share/applications/eclipse.desktop \
-    && echo "Icon=/usr/share/eclipse/icon.xpm"   >>/usr/share/applications/eclipse.desktop \
-    && echo "Terminal=false"                     >>/usr/share/applications/eclipse.desktop \
-    && echo "Type=Application"                   >>/usr/share/applications/eclipse.desktop \
-    && echo "Categories=Development;IDE;"        >>/usr/share/applications/eclipse.desktop \
-    && echo "StartupNotify=false"                >>/usr/share/applications/eclipse.desktop
+    && echo '[Desktop Entry]'                    >/usr/share/applications/eclipse.desktop \
+    && echo 'Name=Eclipse'                       >>/usr/share/applications/eclipse.desktop \
+    && echo 'Comment=Eclipse'                    >>/usr/share/applications/eclipse.desktop \
+    && echo 'Exec=/usr/share/eclipse/eclipse'    >>/usr/share/applications/eclipse.desktop \
+    && echo 'Icon=/usr/share/eclipse/icon.xpm'   >>/usr/share/applications/eclipse.desktop \
+    && echo 'Terminal=false'                     >>/usr/share/applications/eclipse.desktop \
+    && echo 'Type=Application'                   >>/usr/share/applications/eclipse.desktop \
+    && echo 'Categories=Development;IDE;'        >>/usr/share/applications/eclipse.desktop \
+    && echo 'StartupNotify=false'                >>/usr/share/applications/eclipse.desktop
 
-# vscode
-RUN curl -LfsSo /tmp/vscode_amd64.deb 'https://vscode.cdn.azure.cn/stable/a0479759d6e9ea56afa657e454193f72aef85bd0/code_1.48.2-1598353430_amd64.deb' \
-    && dpkg -i /tmp/vscode_amd64.deb \
-    && rm -rf /tmp/vscode_amd64.deb \
-    && echo "[Desktop Entry]"                               >/usr/share/applications/code.desktop \
-    && echo "Name=Visual Studio Code"                       >>/usr/share/applications/code.desktop \
-    && echo "Comment=Code Editing. Redefined."              >>/usr/share/applications/code.desktop \
-    && echo "Exec=/usr/share/code/code --no-sandbox --user-data-dir=/root/.vscode --unity-launch %F"    >>/usr/share/applications/code.desktop \
-    && echo "Icon=com.visualstudio.code"                    >>/usr/share/applications/code.desktop \
-    && echo "Type=Application"                              >>/usr/share/applications/code.desktop \
-    && echo "Terminal=false"                                >>/usr/share/applications/code.desktop \
-    && echo "StartupNotify=false"                           >>/usr/share/applications/code.desktop \
-    && echo "StartupWMClass=Code"                           >>/usr/share/applications/code.desktop \
-    && echo "Categories=Development;IDE;"                   >>/usr/share/applications/code.desktop
-
+# 切换普通用户
+USER 1001

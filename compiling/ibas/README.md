@@ -3,7 +3,7 @@ ibas应用的编译环境
 
 ## 编译环境 | content
 * git
-* jdk
+* jdk8
 * maven
 * node
 * typescript
