@@ -1,5 +1,5 @@
 # 基于[windows nano server]镜像
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551_zh-cn
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -16,7 +16,7 @@ RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
     Remove-Item -Force -Recurse -LiteralPath 'C:\Certs\';
 
 # 安装Nginx
-ARG NGINX_VERSION=1.23.1
+ARG NGINX_VERSION=1.20.2
 ENV NGINX_HOME C:\\nginx
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri https://nginx.org/download/nginx-${Env:NGINX_VERSION}.zip -O nginx.zip; \

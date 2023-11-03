@@ -1,4 +1,4 @@
-# 基于[windows nano server]镜像
+# 基于[windows core server]镜像
 FROM colorcoding/nginx:wincore
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]

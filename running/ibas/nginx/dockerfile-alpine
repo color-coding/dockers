@@ -1,11 +1,11 @@
-# 基于官方nginx镜像
-FROM nginx:alpine
+# 基于nginx镜像
+FROM colorcoding/nginx:alpine
 
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
 # 安装工具
-RUN apk add --no-cache unzip curl wget \
+RUN apk add --no-cache unzip curl \
     && rm -rf /var/cache/apk/*
 
 # 环境变量-NGINX目录
@@ -24,7 +24,7 @@ RUN set -x \
     && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh \
     && rm -rf /tmp/btulz.scripts
 
-RUN chmod 775 ${NGINX_HOME}/*.sh
+RUN chmod +x ${NGINX_HOME}/*.sh
 
 # 设置工作目录
 WORKDIR ${NGINX_HOME}

@@ -2,7 +2,7 @@
 FROM colorcoding/openjdk:8-jdk-wincore as installer
 
 # 从基础镜像拷贝文件
-FROM mcr.microsoft.com/windows/nanoserver:10.0.14393.2551_zh-cn
+FROM mcr.microsoft.com/windows/nanoserver:10.0.14393.2551
 # Set JAVA_HOME and PATH environment variables
 ENV JAVA_HOME="C:\\Program Files\\AdoptOpenJDK\\jdk-8.0.292.10-openj9" \
     ProgramFiles="C:\\Program Files" \

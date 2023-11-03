@@ -1,0 +1,7 @@
+# 基于alpine-3.13构建镜像
+FROM nginx:1.20.2-alpine
+
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+COPY conf/linux.nginx.conf /etc/nginx/nginx.conf
+

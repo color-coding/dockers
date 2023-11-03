@@ -9,9 +9,6 @@ ibas应用的编译环境
 * typescript
 
 ## 使用说明 | instruction
-* compiling:ibas debian
-~~~
-docker build --force-rm -f ./dockerfile -t colorcoding/compiling:ibas ./
 ~~~
 * compiling:ibas-alpine
 ~~~
@@ -19,7 +16,7 @@ docker build --force-rm -f ./dockerfile-alpine -t colorcoding/compiling:ibas-alp
 ~~~
 * developing:ibas ubuntn
 ~~~
-docker build --force-rm -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas ./
+docker build --force-rm -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas-ubuntu ./
 ~~~
 
 

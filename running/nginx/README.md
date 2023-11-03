@@ -2,6 +2,10 @@
 自建nginx镜像
 
 ## 主要内容 | content
+* nginx:alpine
+~~~
+docker build --force-rm -f ./dockerfile-alpine -t colorcoding/nginx:alpine ./
+~~~
 * nginx:wincore
 ~~~
 docker build --force-rm -f ./dockerfile-wincore -t colorcoding/nginx:wincore ./

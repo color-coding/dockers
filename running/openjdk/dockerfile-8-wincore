@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551_zh-cn
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
 
 # $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]

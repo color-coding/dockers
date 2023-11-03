@@ -6,10 +6,6 @@ ibas应用的运行环境
 * NGINX_HOME /usr/share/nginx         环境变量
 
 ## 使用说明 | instruction
-* nginx:ibas
-~~~
-docker build --force-rm -f ./dockerfile -t colorcoding/nginx:ibas ./
-~~~
 * nginx:ibas-alpine
 ~~~
 docker build --force-rm -f ./dockerfile-alpine -t colorcoding/nginx:ibas-alpine ./
