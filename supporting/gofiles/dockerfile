@@ -1,0 +1,58 @@
+# 基于镜像alpine
+FROM alpine:3.13
+
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+# 安装环境
+RUN set -x \
+    # 安装工具
+    && apk add --no-cache busybox-extras curl \
+    openssh-client unrar unzip aria2 \
+    # 安装FileBrowser依赖
+    ca-certificates mailcap jq \
+    # 删除源
+    && rm -rf /var/cache/apk/* \
+    && rm -rf /tmp/*.apk
+
+# 安装FileBrowser
+ARG FB_VERSION=v2.27.0
+RUN set -x \
+    # 下载文件
+    && curl -LfsSo filebrowser.tar.gz https://github.com/filebrowser/filebrowser/releases/download/${FB_VERSION}/${TARGETOS}-${TARGETARCH}${TARGETVARIANT}-filebrowser.tar.gz \
+    # 解压安装
+    && mkdir -p /usr/share/filebrowser \
+    && tar zxvf filebrowser.tar.gz -C /usr/share/filebrowser \
+    && ln -s /usr/share/filebrowser/filebrowser /usr/bin/filebrowser \
+    # 删除文件
+    && rm -rf filebrowser.tar.gz
+
+# 安装Gost
+ARG GOST_VERSION=2.11.5
+RUN set -x \
+    # 下载文件
+    && if [ ${TARGETARCH} = "arm64" ]; \ 
+    then \
+    GOST_FILE=gost-${TARGETOS}-armv8; \
+    else \
+    GOST_FILE=gost-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}; \
+    fi; \
+    curl -LfsSo gost.gz https://github.com/ginuerzh/gost/releases/download/v${GOST_VERSION}/${GOST_FILE}-${GOST_VERSION}.gz \
+    # 解压安装
+    && mkdir -p /usr/share/gost \
+    && gunzip gost.gz \
+    && mv ./gost /usr/share/gost/gost \
+    && chmod +x /usr/share/gost/gost \
+    && ln -s /usr/share/gost/gost /usr/bin/gost
+
+# 初始化脚本
+COPY entrypoint.sh /entrypoint.sh
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+# 暴露端口
+EXPOSE 80 8080 8443 8338
