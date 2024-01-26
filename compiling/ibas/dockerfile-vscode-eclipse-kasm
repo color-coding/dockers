@@ -1,5 +1,5 @@
 # 基于镜像ubuntu
-FROM colorcoding/webtop:ubuntu
+FROM colorcoding/webtop:ubuntu-kasm
 
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
@@ -8,9 +8,9 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    unzip dos2unix git nodejs npm \
+    unzip dos2unix git nodejs \
     # vscode依赖,tfs依赖
-    libsecret-1-0 libnss3 gnupg libxss1 libxtst6 libkrb5-dev \
+    libsecret-1-0 libkrb5-dev \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
@@ -56,7 +56,7 @@ RUN curl -LfsSo /tmp/vscode_amd64.deb 'https://update.code.visualstudio.com/1.48
     && echo '[Desktop Entry]'                               >/usr/share/applications/code.desktop \
     && echo 'Name=Visual Studio Code'                       >>/usr/share/applications/code.desktop \
     && echo 'Comment=Code Editing. Redefined.'              >>/usr/share/applications/code.desktop \
-    && echo 'Exec=/usr/share/code/code --user-data-dir --no-sandbox --unity-launch %F'    >>/usr/share/applications/code.desktop \
+    && echo 'Exec=/usr/share/code/code --no-sandbox --unity-launch %F'    >>/usr/share/applications/code.desktop \
     && echo 'Icon=com.visualstudio.code'                    >>/usr/share/applications/code.desktop \
     && echo 'Type=Application'                              >>/usr/share/applications/code.desktop \
     && echo 'Terminal=false'                                >>/usr/share/applications/code.desktop \

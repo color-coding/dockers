@@ -11,6 +11,6 @@ docker build --force-rm -f ./dockerfile-alpine -t colorcoding/nginx:alpine ./
 docker build --force-rm -f ./dockerfile-wincore -t colorcoding/nginx:wincore ./
 ~~~
 
-### 鸣谢 | thanks
+## 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
 [Color-Coding](http://colorcoding.org/ "咔啦工作室")<br>

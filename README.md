@@ -11,6 +11,6 @@
 * [详细说明：ibas nginx](./running/ibas/nginx/README.md)
 * [详细说明：ibas tomcat](./running/ibas/tomcat/README.md)
 
-### 鸣谢 | thanks
+## 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>
 [Color-Coding](http://colorcoding.org/ "咔啦工作室")<br>

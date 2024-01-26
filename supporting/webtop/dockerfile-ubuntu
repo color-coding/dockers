@@ -1,0 +1,27 @@
+# 基于镜像ubuntu
+FROM accetto/ubuntu-vnc-xfce-firefox-g3:20.04
+
+USER 0
+# 安装常用软件
+RUN set -x \
+    && DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+    curl aria2 iputils-ping \
+    ttf-wqy-zenhei xarchiver thunar-archive-plugin \
+    # 删除源
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
+
+# 调整参数
+ENV \
+    NOVNC_PORT="80" \
+    VNC_PORT="8080"
+
+# 输出VNC/noVNC配置
+RUN \
+    echo     "# VNC/noVNC"                             >${HOME}/.vnc_override.rc \
+    && echo  "export NOVNC_PORT=${NOVNC_PORT}"         >>${HOME}/.vnc_override.rc \
+    && echo  "export VNC_PORT=${VNC_PORT}"             >>${HOME}/.vnc_override.rc
+
+EXPOSE ${VNC_PORT} ${NOVNC_PORT}
