@@ -13,5 +13,6 @@ COPY --from=installer ["${CATALINA_HOME}", "${CATALINA_HOME}"]
 RUN echo call catalina.bat run>C:\\EntryPoint.bat
 
 WORKDIR ${CATALINA_HOME}
-CMD ["C:\\EntryPoint.bat"]
+
 EXPOSE 8080
+ENTRYPOINT ["C:\\EntryPoint.bat"]

@@ -6,7 +6,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 
 # 安装工具
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
-    Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z2201-x64.msi" -OutFile 'C:\7zip.msi'; \
+    Invoke-WebRequest -Uri "https://www.7-zip.org/a/7z1900-x64.msi" -OutFile 'C:\7zip.msi'; \
     $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'C:\7zip.msi', '/quiet' -Wait -Passthru; $proc.WaitForExit(); \
     IF ($proc.ExitCode -ne 0) { \
         Write-Host 'FAILED installing 7-ZIP!'; exit 1; \

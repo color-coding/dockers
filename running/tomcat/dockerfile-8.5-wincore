@@ -21,8 +21,8 @@ RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
 
 # 安装TOMCAT
 ARG TOMCAT_MAJOR=8
-ARG TOMCAT_VERSION=8.5.95
-ARG TOMCAT_SHA512=370b329749cdeb2bdb329f3b5528837d32bc3c3f0ed36e7c832343cd3d75713474852dd89c06cc62f815aa07e1177d8a2ff90b29562643f0621ef5cf0eb7a4e8
+ARG TOMCAT_VERSION=8.5.99
+ARG TOMCAT_SHA512=aadf8d812471df9ca5689b547e6aee33d903369ec5ea977a8c85397bc0e06908c1ee128c253006cc3569e6ed9da77d4bac9091b944d6c7cef7650b1dde492197
 
 ENV CATALINA_HOME C:\\apache-tomcat
 
@@ -39,5 +39,6 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 SHELL ["cmd", "/S", "/C"]
 
 WORKDIR ${CATALINA_HOME}
-CMD ["catalina.bat", "run"]
+
 EXPOSE 8080
+ENTRYPOINT ["catalina.bat", "run"]
