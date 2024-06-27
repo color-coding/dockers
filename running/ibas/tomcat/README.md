@@ -6,10 +6,6 @@ ibas应用的运行环境
 * ibas/conf                           ibas配置
 
 ## 使用说明 | instruction
-* tomcat:ibas
-~~~
-docker build --force-rm --no-cache -f ./dockerfile -t colorcoding/tomcat:ibas ./
-~~~
 * tomcat:ibas-alpine
 ~~~
 docker build --force-rm --no-cache -f ./dockerfile-alpine -t colorcoding/tomcat:ibas-alpine ./

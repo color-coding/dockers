@@ -22,8 +22,8 @@ FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
 # $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG OPENJDK_URL=https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_x64_windows_openj9_8u292b10_openj9-0.26.0.msi
-ARG OPENJDK_SHA256=49e59ddbf8d9bcffbfe7c02bc4911ccc44b2426db4f4f02a3c13c3c0dadc28df
+ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_windows_8u412b08_openj9-0.44.0.msi
+ARG OPENJDK_SHA256=b5ec835f651848bdb8accd27d2525b27d62805100ce114dc375c6424e57a8b60
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
     IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \

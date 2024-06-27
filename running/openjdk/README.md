@@ -1,6 +1,6 @@
 # openjdk
 OpenJDK with openj9
-https://github.com/AdoptOpenJDK/openjdk-docker
+https://github.com/ibmruntimes/semeru8-binaries/releases/
 
 ## 主要内容 | content
 * openjdk:8-jdk-alpine

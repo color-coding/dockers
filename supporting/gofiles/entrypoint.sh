@@ -25,6 +25,4 @@ if [ ! -e /etc/filebrowser/database.db ]; then
     filebrowser users add "admin" "1q2w3e"
 fi
 # filebrowser - a nas
-nohup filebrowser &
-# gost - a proxy
-gost -L http://:8080 -L https://:8443 -L ss://chacha20:1q2w3e@:8338
+nohup filebrowser

@@ -2,7 +2,7 @@
 FROM colorcoding/tomcat:ibas-wincore as installer
 
 # 拷贝tomcat文件
-FROM colorcoding/tomcat:8.5-winnano
+FROM colorcoding/tomcat:9.0-winnano
 
 ENV PATH="${PATH};${ProgramFiles}/7-zip/"
 
