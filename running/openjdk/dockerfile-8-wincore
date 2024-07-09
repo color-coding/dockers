@@ -40,4 +40,4 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Remove-Item -Path C:\temp -Force -Recurse | Out-Null; \
     Remove-Item openjdk.msi -Force;
 
-ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,readonly,nonFatal"
+ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,nonFatal"

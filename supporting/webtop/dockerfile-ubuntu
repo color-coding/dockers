@@ -1,7 +1,7 @@
 # 基于镜像ubuntu
 FROM accetto/ubuntu-vnc-xfce-firefox-g3:20.04
 
-USER 0
+USER root
 # 安装常用软件
 RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
@@ -12,16 +12,16 @@ RUN set -x \
     # 删除源
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
+# 设置系统权限
+RUN set -x \
+    && filePath=$(which python3) \
+    && if [ -L $filePath ]; then filePath=$(readlink -f $filePath); fi \
+    && if [ -e $filePath ]; then setcap "cap_net_bind_service=+eip" $filePath; fi
 
 # 调整参数
-ENV \
-    NOVNC_PORT="80" \
-    VNC_PORT="8080"
+ENV NOVNC_PORT=80 \
+    TINI_SUBREAPER=1
 
-# 输出VNC/noVNC配置
-RUN \
-    echo     "# VNC/noVNC"                             >${HOME}/.vnc_override.rc \
-    && echo  "export NOVNC_PORT=${NOVNC_PORT}"         >>${HOME}/.vnc_override.rc \
-    && echo  "export VNC_PORT=${VNC_PORT}"             >>${HOME}/.vnc_override.rc
+EXPOSE ${NOVNC_PORT}
 
-EXPOSE ${VNC_PORT} ${NOVNC_PORT}
+USER "${HEADLESS_USER_ID}"

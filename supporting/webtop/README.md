@@ -1,14 +1,14 @@
 # Web Desktop
-基于ubuntu的浏览器桌面环境
+基于Linux的浏览器桌面环境
 
 ## 编译容器 | building
 * webtop:ubuntu
 ~~~
 docker build --rm --force-rm -f ./dockerfile-ubuntu -t colorcoding/webtop:ubuntu ./
 ~~~
-* webtop:ubuntu-kasm
+* webtop:alpine
 ~~~
-docker build --rm --force-rm -f ./dockerfile-ubuntu-kasm -t colorcoding/webtop:ubuntu-kasm ./
+docker build --rm --force-rm -f ./dockerfile-alpine -t colorcoding/webtop:alpine ./
 ~~~
 
 ## 使用说明 | using
@@ -16,9 +16,9 @@ docker build --rm --force-rm -f ./dockerfile-ubuntu-kasm -t colorcoding/webtop:u
 ~~~
 docker run --rm -d -p 80:80 colorcoding/webtop:ubuntu
 ~~~
-* webtop:ubuntu-kasm
+* webtop:alpine
 ~~~
-docker run --rm -d -p 80:80 colorcoding/webtop:ubuntu-kasm
+docker run --rm -d -p 80:80 colorcoding/webtop:alpine
 ~~~
 
 ## 鸣谢 | thanks

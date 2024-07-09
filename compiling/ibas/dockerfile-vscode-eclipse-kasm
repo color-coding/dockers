@@ -1,5 +1,5 @@
 # 基于镜像ubuntu
-FROM colorcoding/webtop:ubuntu-kasm
+FROM linuxserver/webtop:ubuntu-xfce
 
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
@@ -8,16 +8,17 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    unzip dos2unix git nodejs \
+    unzip dos2unix git nodejs npm \
+    ttf-wqy-zenhei xarchiver thunar-archive-plugin \
     # vscode依赖,tfs依赖
     libsecret-1-0 libkrb5-dev \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
 # jdk8
-ENV JAVA_VERSION=jdk8u292-b10_openj9-0.26.0
-ARG JAVA_ESUM=06d6c9421778575cf59d50f69b7ac6a7bb237485b3a3c2f89cfb61a056c7b2de
-ARG JAVA_BINARY_URL=https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_x64_linux_openj9_8u292b10_openj9-0.26.0.tar.gz
+ENV JAVA_VERSION=jdk8u412-b08_openj9-0.44.0
+ARG JAVA_ESUM=85af2c57078aab240ce31ba3f7a8e86696ff5bdf4c30f3c37f107986f07b23a6
+ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_8u412b08_openj9-0.44.0.tar.gz'
 
 RUN set -x \
     && curl -LfsSo /tmp/openjdk.tar.gz ${JAVA_BINARY_URL} \
@@ -86,6 +87,7 @@ RUN curl -LfsSo /tmp/TFSEclipsePlugin.zip 'https://github.com/microsoft/team-exp
     && mv /tmp/TFSEclipsePlugin/plugins/*.jar /usr/share/eclipse/plugins/ \
     && rm -rf /tmp/TFSEclipsePlugin.zip /tmp/TFSEclipsePlugin 
 
+# user setting
 RUN \
     mkdir -p ${HOME}/.config/Code/User/ \
     && echo '{"update.mode": "none"}' >${HOME}/.config/Code/User/settings.json

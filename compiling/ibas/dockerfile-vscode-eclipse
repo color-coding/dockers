@@ -4,6 +4,8 @@ FROM colorcoding/webtop:ubuntu
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
+USER root
+
 RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
@@ -15,10 +17,9 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/*
 
 # jdk8
-ENV JAVA_VERSION=jdk8u292-b10_openj9-0.26.0
-ARG JAVA_ESUM=06d6c9421778575cf59d50f69b7ac6a7bb237485b3a3c2f89cfb61a056c7b2de
-ARG JAVA_BINARY_URL=https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10_openj9-0.26.0/OpenJDK8U-jdk_x64_linux_openj9_8u292b10_openj9-0.26.0.tar.gz
-
+ENV JAVA_VERSION=jdk8u412-b08_openj9-0.44.0
+ARG JAVA_ESUM=85af2c57078aab240ce31ba3f7a8e86696ff5bdf4c30f3c37f107986f07b23a6
+ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_8u412b08_openj9-0.44.0.tar.gz'
 RUN set -x \
     && curl -LfsSo /tmp/openjdk.tar.gz ${JAVA_BINARY_URL} \
     && echo "${JAVA_ESUM} */tmp/openjdk.tar.gz" | sha256sum -c - \
@@ -26,14 +27,12 @@ RUN set -x \
     && cd /opt/java/openjdk \
     && tar -xf /tmp/openjdk.tar.gz --strip-components=1 \
     && rm -rf /tmp/openjdk.tar.gz
-
 ENV JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:$PATH"
 
 # maven
 ARG MAVEN_SHA=332088670d14fa9ff346e6858ca0acca304666596fec86eea89253bd496d3c90deae2be5091be199f48e09d46cec817c6419d5161fb4ee37871503f472765d00
 ARG MAVEN_BINARY_URL=https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
-
 RUN set -x \
     && mkdir -p /usr/share/maven \
     && curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BINARY_URL} \
@@ -41,7 +40,6 @@ RUN set -x \
     && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
     && rm -f /tmp/apache-maven.tar.gz \
     && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
-
 ENV MAVEN_HOME /usr/share/maven
 COPY conf/maven.settings.xml ${MAVEN_HOME}/conf/settings.xml
 
@@ -79,13 +77,27 @@ RUN curl -LfsSo /tmp/eclipse.tar.gz 'https://www.eclipse.org/downloads/download.
     && echo 'Type=Application'                   >>/usr/share/applications/eclipse.desktop \
     && echo 'Categories=Development;IDE;'        >>/usr/share/applications/eclipse.desktop \
     && echo 'StartupNotify=false'                >>/usr/share/applications/eclipse.desktop
+
 # tfs plugin
-RUN curl -LfsSo /tmp/TFSEclipsePlugin.zip 'https://github.com/microsoft/team-explorer-everywhere/releases/download/14.139.0/TFSEclipsePlugin-UpdateSiteArchive-14.139.0.zip'\
+ARG TEE_VERSION=14.139.0
+RUN \
+    # plugin
+    curl -LfsSo /tmp/TFSEclipsePlugin.zip https://github.com/microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TFSEclipsePlugin-UpdateSiteArchive-${TEE_VERSION}.zip \
     && unzip -o /tmp/TFSEclipsePlugin.zip -d /tmp/TFSEclipsePlugin \
     && mv /tmp/TFSEclipsePlugin/features/*.jar /usr/share/eclipse/features/ \
     && mv /tmp/TFSEclipsePlugin/plugins/*.jar /usr/share/eclipse/plugins/ \
-    && rm -rf /tmp/TFSEclipsePlugin.zip /tmp/TFSEclipsePlugin 
+    && rm -rf /tmp/TFSEclipsePlugin.zip /tmp/TFSEclipsePlugin \
+    # tools
+    && curl -LfsSo /tmp/TEE-CLC.zip https://github.com/microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip \
+    && unzip -o /tmp/TEE-CLC.zip -d /usr/share/ \
+    && ln -s /usr/share/TEE-CLC-${TEE_VERSION}/tf /usr/bin/tf \
+    && rm -rf /tmp/TEE-CLC.zip
+ENV TF_CLC_HOME /usr/share/TEE-CLC-${TEE_VERSION}/
 
+# user setting
 RUN \
     mkdir -p ${HOME}/.config/Code/User/ \
-    && echo '{"update.mode": "none"}' >${HOME}/.config/Code/User/settings.json
+    && echo '{"update.mode": "none"}' >${HOME}/.config/Code/User/settings.json \
+    && "${STARTUPDIR}"/set_user_permissions.sh "${HOME}"
+
+USER "${HEADLESS_USER_ID}"
