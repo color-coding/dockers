@@ -14,10 +14,6 @@ docker build --force-rm --no-cache -f ./dockerfile-alpine -t colorcoding/tomcat:
 ~~~
 docker build --force-rm --no-cache -f ./dockerfile-wincore -t colorcoding/tomcat:ibas-wincore ./
 ~~~
-* tomcat:ibas-winnano
-~~~
-docker build --force-rm --no-cache -f ./dockerfile-winnano -t colorcoding/tomcat:ibas-winnano ./
-~~~
 
 ## 鸣谢 | thanks
 [牛加人等于朱](http://baike.baidu.com/view/1769.htm "NiurenZhu")<br>

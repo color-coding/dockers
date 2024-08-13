@@ -1,4 +1,4 @@
-# 基于[windows server core]镜像
+# 基于[windows server core 2016]镜像
 FROM colorcoding/openjdk:8-jdk-wincore
 
 # 维护者
@@ -21,8 +21,8 @@ RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
 
 # 安装TOMCAT
 ENV TOMCAT_MAJOR 9
-ENV TOMCAT_VERSION 9.0.90
-ARG TOMCAT_SHA512=a3d95bc1e35106d04e1bc1e9d4cb91e63e3a4c336339ea639a6715b76c91081e3739af28dcaf528b44a39e16353c7c754fe5367934032f3803f667300bef8242
+ENV TOMCAT_VERSION 9.0.93
+ARG TOMCAT_SHA512=f205ff22a5e561d3a23e3dcbbc1173acb33655843aa4a9173bb8385c7165675b0e0d591303347673374807dd829068fc1037827de99efb66d385596e1a6349fa
 
 ENV CATALINA_HOME C:\\apache-tomcat
 

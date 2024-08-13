@@ -61,8 +61,8 @@ RUN set -eux; \
     ARCH="$(apk --print-arch)"; \
     case "${ARCH}" in \
     amd64|x86_64) \
-    ESUM='85af2c57078aab240ce31ba3f7a8e86696ff5bdf4c30f3c37f107986f07b23a6'; \
-    BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_8u412b08_openj9-0.44.0.tar.gz'; \
+    ESUM='9b2ab3178973037ec46195bd8edbeea0772fe2d584636d2b1e00ec74fc1f4cab'; \
+    BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u422-b05_openj9-0.46.0/ibm-semeru-open-jdk_x64_linux_8u422b05_openj9-0.46.0.tar.gz'; \
     ;; \
     *) \
     echo "Unsupported arch: ${ARCH}"; \

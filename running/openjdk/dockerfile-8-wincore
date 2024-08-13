@@ -1,29 +1,10 @@
-# ------------------------------------------------------------------------------
-#               NOTE: THIS DOCKERFILE IS GENERATED VIA "build_latest.sh" or "update_multiarch.sh"
-#
-#                       PLEASE DO NOT EDIT IT DIRECTLY.
-# ------------------------------------------------------------------------------
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# 基于[windows server core 2016]镜像
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.7259
 
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
-
-# $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_windows_8u412b08_openj9-0.44.0.msi
-ARG OPENJDK_SHA256=b5ec835f651848bdb8accd27d2525b27d62805100ce114dc375c6424e57a8b60
+ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u422-b05_openj9-0.46.0/ibm-semeru-open-jdk_x64_windows_8u422b05_openj9-0.46.0.msi
+ARG OPENJDK_SHA256=40d4df98f971d16b9e9acd75f690665f1ae189b88e69646db8e9ed53484fdc6f
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
     IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \

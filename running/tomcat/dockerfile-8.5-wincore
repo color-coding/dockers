@@ -1,4 +1,4 @@
-# 基于[windows server core]镜像
+# 基于[windows server core 2016]镜像
 FROM colorcoding/openjdk:8-jdk-wincore
 
 # 维护者

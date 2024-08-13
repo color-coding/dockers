@@ -1,5 +1,5 @@
-# 基于[windows nano server]镜像
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.2551
+# 基于[windows server core 2016]镜像
+FROM mcr.microsoft.com/windows/servercore:10.0.14393.7259
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -25,6 +25,8 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Remove-Item nginx.zip -Force;
 
 COPY conf/win.nginx.conf C:/nginx/conf/nginx.conf
+
+SHELL ["cmd", "/S", "/C"]
 
 WORKDIR ${NGINX_HOME}
 ENTRYPOINT ["nginx.exe"]

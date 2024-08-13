@@ -12,10 +12,6 @@ docker build --force-rm -f ./dockerfile-8.5-alpine -t colorcoding/tomcat:8.5-alp
 # certs目录为证书，脚本会自动注册
 docker build --force-rm -f ./dockerfile-8.5-wincore -t colorcoding/tomcat:8.5-wincore ./
 ~~~
-* tomcat:8.5-winnano
-~~~
-docker build --force-rm -f ./dockerfile-8.5-winnano -t colorcoding/tomcat:8.5-winnano ./
-~~~
 ### tomcat 9.0
 * tomcat:9.0-alpine
 ~~~
@@ -25,10 +21,6 @@ docker build --force-rm -f ./dockerfile-9.0-alpine -t colorcoding/tomcat:9.0-alp
 ~~~
 # certs目录为证书，脚本会自动注册
 docker build --force-rm -f ./dockerfile-9.0-wincore -t colorcoding/tomcat:9.0-wincore ./
-~~~
-* tomcat:9.0-winnano
-~~~
-docker build --force-rm -f ./dockerfile-9.0-winnano -t colorcoding/tomcat:9.0-winnano ./
 ~~~
 
 ## 鸣谢 | thanks
