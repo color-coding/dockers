@@ -21,8 +21,8 @@ ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$TOMCAT_NATIVE_LIBDIR
 ENV GPG_KEYS 48F8E69F6390C9F25CFEDCD268248959359E722B A9C5DF4D22E99998D9875A5110C01C5A2F6059E7 DCFD35E0BF8CA7344752DE8B6FB21E8933C60243
 
 ENV TOMCAT_MAJOR 9
-ENV TOMCAT_VERSION 9.0.93
-ENV TOMCAT_SHA512 3069924eb7041ccc0f2aeceb7d8626793a1a073a5b739a840d7974a18ebeb26cc3374cc5f4a3ffc74d3b019c0cb33e3d1fe96296e6663ac75a73c1171811726d
+ENV TOMCAT_VERSION 9.0.99
+ENV TOMCAT_SHA512 bf406b3e288e1732d82d08f54e160095451a6cc969f72adf395c074d6d08893ef1ccd2afcd55f01ca8e54131f587c88055832f36330a1ede0cc2f84440cf54df
 
 ENV TOMCAT_TGZ_URLS \
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
@@ -43,9 +43,9 @@ RUN set -eux; \
 	\
 	apk add --no-cache --virtual .fetch-deps \
 		gnupg \
-		\
 		ca-certificates \
 		openssl \
+		curl \
 	; \
 	\
 	export GNUPGHOME="$(mktemp -d)"; \
@@ -55,7 +55,7 @@ RUN set -eux; \
 	\
 	success=; \
 	for url in $TOMCAT_TGZ_URLS; do \
-		if wget -O tomcat.tar.gz "$url"; then \
+		if curl -LfsSo tomcat.tar.gz "$url"; then \
 			success=1; \
 			break; \
 		fi; \
@@ -66,7 +66,7 @@ RUN set -eux; \
 	\
 	success=; \
 	for url in $TOMCAT_ASC_URLS; do \
-		if wget -O tomcat.tar.gz.asc "$url"; then \
+		if curl -LfsSo tomcat.tar.gz.asc "$url"; then \
 			success=1; \
 			break; \
 		fi; \

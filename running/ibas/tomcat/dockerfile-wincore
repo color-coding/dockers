@@ -35,4 +35,5 @@ RUN Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releas
 
 # 拷贝配置文件
 COPY conf/* ${CATALINA_HOME}/conf/
+COPY bin/* ${CATALINA_HOME}/bin/
 # COPY ibas/ ${CATALINA_HOME}/ibas/ 挂载非空目录报错

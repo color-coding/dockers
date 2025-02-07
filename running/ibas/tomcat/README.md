@@ -3,6 +3,7 @@ ibas应用的运行环境
 
 ## 主要内容 | content
 * conf                                tomcat配置
+* bin                                 tomcat参数
 * ibas/conf                           ibas配置
 
 ## 使用说明 | instruction
