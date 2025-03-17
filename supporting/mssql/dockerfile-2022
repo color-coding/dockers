@@ -1,0 +1,40 @@
+# SQL Server 2022 Windows container dockerfile
+## Warning: Restarting windows container causes the machine key to change and hence if you have any encryption configured then restarting SQL On Windows containers
+## breaks the encryption key chain in SQL Server. 
+
+# Download the SQL Developer from the following location https://go.microsoft.com/fwlink/p/?linkid=2215158 and extract the .box and .exe files using the option: "Download Media"
+# .\SQL2022-SSEI-Dev.exe /QUIET /Action=Download /MEDIATYPE=CAB /LANGUAGE=en-US
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+ENV SA_PASSWORD="_" \
+        ACCEPT_EULA="_" \
+        ATTACH_DBS="[]" 
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+WORKDIR /
+
+# make install files accessible
+# COPY SQLServer2022-DEV-x64-ENU.box /
+# COPY SQLServer2022-DEV-x64-ENU.exe /
+COPY SQL2022-SSEI-Dev.exe /
+
+# download setup files
+ RUN Start-Process -Wait -FilePath .\SQL2022-SSEI-Dev.exe -ArgumentList /QUIET, /Action=Download, /MEDIAPATH="C:/", /MEDIATYPE=CAB, /LANGUAGE=en-US ; \
+# start setup
+# RUN \
+        Start-Process -Wait -FilePath .\SQLServer2022-DEV-x64-ENU.exe -ArgumentList /qs, /x:setup ; \
+        .\setup\setup.exe /q /ACTION=Install /INSTANCENAME=MSSQLSERVER /FEATURES=SQLEngine /UPDATEENABLED=0 /SQLSVCACCOUNT='NT AUTHORITY\NETWORK SERVICE' /SQLSYSADMINACCOUNTS='BUILTIN\ADMINISTRATORS' /TCPENABLED=1 /NPENABLED=0 /IACCEPTSQLSERVERLICENSETERMS ; \
+        Remove-Item -Recurse -Force SQLServer2022-DEV-x64-ENU.exe, SQLServer2022-DEV-x64-ENU.box, setup
+
+RUN stop-service MSSQLSERVER ; \
+        set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql16.MSSQLSERVER\mssqlserver\supersocketnetlib\tcp\ipall' -name tcpdynamicports -value '' ; \
+        set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql16.MSSQLSERVER\mssqlserver\supersocketnetlib\tcp\ipall' -name tcpport -value 1433 ; \
+        set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql16.MSSQLSERVER\mssqlserver\' -name LoginMode -value 2 ;
+
+COPY start.ps1 /
+
+CMD .\start -sa_password $env:SA_PASSWORD -accept_eula $env:ACCEPT_EULA -attach_dbs \"$env:ATTACH_DBS\" -Verbose
+
+EXPOSE 1433

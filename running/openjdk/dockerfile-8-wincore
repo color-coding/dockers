@@ -1,5 +1,5 @@
 # 基于[windows server core 2016]镜像
-FROM mcr.microsoft.com/windows/servercore:10.0.14393.7259
+FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 

@@ -4,6 +4,8 @@
 *.tmp
 *.tar
 *.zip
+SQL*.exe
+SQL*.box
 
 # folder
 ibas_packages/
