@@ -2,20 +2,20 @@
 maven、docker等仓库管理器
 
 ## 编译容器 | building
-* nexus:centos
+* nexus:latest
 ~~~
-docker build --rm --force-rm -f ./dockerfile-centos -t colorcoding/nexus:centos ./
+docker build --rm --force-rm -f ./dockerfile-ibm-semeru -t colorcoding/nexus:latest ./
 ~~~
 
 ## 使用说明 | using
-* nexus:centos
+* nexus:latest
 ~~~
 chown -R 200 $PWD/nexus-data
 docker run -d \
     --name nexus-cc-maven \
     -m 2g \
     -v $PWD/nexus-data:/nexus-data \
-    colorcoding/nexus:centos
+    colorcoding/nexus:latest
 ~~~
 
 ## 鸣谢 | thanks

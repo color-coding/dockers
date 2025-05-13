@@ -1,12 +1,12 @@
-# 基于Centos7 + JAVA8 + OpenJ9
+# 基于Ubuntu + JAVA8 + OpenJ9
 
-FROM ibm-semeru-runtimes:open-8-jre-centos7
+FROM ibm-semeru-runtimes:open-8-jre
 
 LABEL name="Nexus Repository Manager" \
     maintainer="Niuren.Zhu <niuren.zhu@icloud.com>" \
     vendor=ColorCoding \
-    version="3.69.0-02" \
-    release="3.69.0" \
+    version="3.70.4-02" \
+    release="3.70.4" \
     url="https://sonatype.com" \
     summary="The Nexus Repository Manager server \
     with universal support for popular component formats." \
@@ -24,10 +24,10 @@ LABEL name="Nexus Repository Manager" \
     io.openshift.expose-services="8081:8081" \
     io.openshift.tags="Sonatype,Nexus,Repository Manager"
 
-ARG NEXUS_VERSION=3.69.0-02
+ARG NEXUS_VERSION=3.70.4-02
 ARG NEXUS_JAVA_VERSION=java8
 ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-${NEXUS_JAVA_VERSION}-unix.tar.gz
-ARG NEXUS_DOWNLOAD_SHA256_HASH=4161a1bb43d92ad8ca6185fa0da2c0f02dfd62280c5b6e4ac4419df4aecaf55f
+ARG NEXUS_DOWNLOAD_SHA256_HASH=85632d6f198061bb9d170fcbccea6c2a04c38147845034445e1314c325f97711
 
 # Configure nexus runtime
 ENV SONATYPE_DIR=/opt/sonatype
@@ -69,6 +69,6 @@ VOLUME ${NEXUS_DATA}
 EXPOSE 8081
 USER nexus
 
-ENV INSTALL4J_ADD_VM_PARAMS="-Xms2048m -Xmx2048m -XX:MaxDirectMemorySize=2048m -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
+ENV INSTALL4J_ADD_VM_PARAMS="-Xms1024m -Xmx2048m -XX:MaxDirectMemorySize=2048m -Djava.util.prefs.userRoot=${NEXUS_DATA}/javaprefs"
 
 CMD ["/opt/sonatype/nexus/bin/nexus", "run"]

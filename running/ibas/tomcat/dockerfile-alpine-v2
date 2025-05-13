@@ -1,0 +1,42 @@
+# 基于官方tomcat镜像
+FROM colorcoding/tomcat:9.0-alpine
+
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+# 安装工具
+RUN set -x \
+    && apk add --no-cache curl tzdata ttf-dejavu \
+    && rm -rf /var/cache/apk/ \
+    && rm -rf /tmp/*.apk
+
+# 创建数据文件夹
+RUN set -x \
+    && mkdir -p ${CATALINA_HOME}/ibas/conf \
+    && mkdir -p ${CATALINA_HOME}/ibas/data \
+    && mkdir -p ${CATALINA_HOME}/ibas/logs \
+    && mkdir -p ${CATALINA_HOME}/ibas_tools \
+    && mkdir -p ${CATALINA_HOME}/ibas_lib
+
+# 下载并部署工具
+RUN set -x \
+    && curl -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest-v2/btulz.transforms-latest-v2.tar \
+    && mkdir -p /tmp/btulz.transforms \
+    && tar -xvf /tmp/btulz.transforms.tar -C /tmp/btulz.transforms \
+    && rm -rf /tmp/btulz.transforms/._* \
+    && cp -f /tmp/btulz.transforms/*.jar ${CATALINA_HOME}/ibas_tools/ \
+    && rm -f /tmp/btulz.transforms.tar \
+    && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
+    && mkdir -p /tmp/btulz.scripts \
+    && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
+    && rm -f /tmp/btulz.scripts.tar \
+    && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh \
+    && cp -f /tmp/btulz.scripts/ibas/initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh \
+    && cp -f /tmp/btulz.scripts/ibas/update_db.sh ${CATALINA_HOME}/update_db.sh \
+    && cp -f /tmp/btulz.scripts/ibas/update_routing.sh ${CATALINA_HOME}/update_routing.sh \
+    && rm -rf /tmp/btulz.scripts
+
+# 拷贝配置文件
+COPY conf/* ${CATALINA_HOME}/conf/
+COPY bin/* ${CATALINA_HOME}/bin/
+COPY ibas/ ${CATALINA_HOME}/ibas/
