@@ -4,11 +4,11 @@
 ## 编译容器 | building
 * webtop:ubuntu
 ~~~
-docker build --rm --force-rm -f ./dockerfile-ubuntu -t colorcoding/webtop:ubuntu ./
+docker build --rm -f ./dockerfile-ubuntu -t colorcoding/webtop:ubuntu ./
 ~~~
 * webtop:alpine
 ~~~
-docker build --rm --force-rm -f ./dockerfile-alpine -t colorcoding/webtop:alpine ./
+docker build --rm -f ./dockerfile-alpine -t colorcoding/webtop:alpine ./
 ~~~
 
 ## 使用说明 | using

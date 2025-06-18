@@ -4,11 +4,11 @@
 ## 主要内容 | content
 * nginx:alpine
 ~~~
-docker build --force-rm -f ./dockerfile-alpine -t colorcoding/nginx:alpine ./
+docker build -f ./dockerfile-alpine -t colorcoding/nginx:alpine ./
 ~~~
 * nginx:wincore
 ~~~
-docker build --force-rm -f ./dockerfile-wincore -t colorcoding/nginx:wincore ./
+docker build -f ./dockerfile-wincore -t colorcoding/nginx:wincore ./
 ~~~
 
 ## 鸣谢 | thanks

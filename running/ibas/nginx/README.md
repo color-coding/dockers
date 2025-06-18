@@ -8,11 +8,11 @@ ibas应用的运行环境
 ## 使用说明 | instruction
 * nginx:ibas-alpine
 ~~~
-docker build --force-rm -f ./dockerfile-alpine -t colorcoding/nginx:ibas-alpine ./
+docker build -f ./dockerfile-alpine -t colorcoding/nginx:ibas-alpine ./
 ~~~
 * nginx:ibas-wincore
 ~~~
-docker build --force-rm -f ./dockerfile-wincore -t colorcoding/nginx:ibas-wincore ./
+docker build -f ./dockerfile-wincore -t colorcoding/nginx:ibas-wincore ./
 ~~~
 
 ## 鸣谢 | thanks

@@ -4,7 +4,7 @@
 ## 编译容器 | building
 * gofiles
 ~~~
-docker build --force-rm -f ./dockerfile --build-arg TARGETOS=linux --build-arg TARGETARCH=amd64 -t colorcoding/gofiles ./
+docker build -f ./dockerfile --build-arg TARGETOS=linux --build-arg TARGETARCH=amd64 -t colorcoding/gofiles ./
 ~~~
 ~~~
 # 多平台编译

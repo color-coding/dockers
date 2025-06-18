@@ -5,12 +5,12 @@ SQL Server Developer Edition for Windows Containers
 * mssql-server:2017
 ~~~
 # 需要先下载安装包，详见dockerfile
-docker build --rm --force-rm -f ./dockerfile-2017 -t colorcoding/mssql-server:2017 ./
+docker build --rm -f ./dockerfile-2017 -t colorcoding/mssql-server:2017 ./
 ~~~
 * mssql-server:2022
 ~~~
 # 需要先下载安装包，详见dockerfile
-docker build --rm --force-rm -f ./dockerfile-2022 -t colorcoding/mssql-server:2022 ./
+docker build --rm -f ./dockerfile-2022 -t colorcoding/mssql-server:2022 ./
 ~~~
 
 ## 使用说明 | using

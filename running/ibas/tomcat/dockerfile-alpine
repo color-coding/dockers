@@ -1,8 +1,12 @@
-# 基于官方tomcat镜像
+# 基于tomcat镜像
 FROM colorcoding/tomcat:9.0-alpine
 
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+# 构建变量
+ARG BTULZ_TRANSFORMS_VERSION=latest
+ARG BTULZ_SCRIPTS_VERSION=latest
 
 # 安装工具
 RUN set -x \
@@ -20,13 +24,14 @@ RUN set -x \
 
 # 下载并部署工具
 RUN set -x \
-    && curl -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/latest/btulz.transforms-latest.tar \
+    && curl --retry 3 -fsSL -o /tmp/btulz.transforms.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/${BTULZ_TRANSFORMS_VERSION}/btulz.transforms-${BTULZ_TRANSFORMS_VERSION}.tar \
     && mkdir -p /tmp/btulz.transforms \
     && tar -xvf /tmp/btulz.transforms.tar -C /tmp/btulz.transforms \
+    && rm -f /tmp/btulz.transforms.tar \
     && rm -rf /tmp/btulz.transforms/._* \
     && cp -f /tmp/btulz.transforms/*.jar ${CATALINA_HOME}/ibas_tools/ \
-    && rm -f /tmp/btulz.transforms.tar \
-    && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
+    && rm -rf /tmp/btulz.transforms \
+    && curl --retry 3 -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/${BTULZ_SCRIPTS_VERSION}/btulz.scripts-${BTULZ_SCRIPTS_VERSION}.tar \
     && mkdir -p /tmp/btulz.scripts \
     && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
     && rm -f /tmp/btulz.scripts.tar \

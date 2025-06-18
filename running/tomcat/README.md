@@ -5,22 +5,26 @@
 ### tomcat 8.5
 * tomcat:8.5-alpine
 ~~~
-docker build --force-rm -f ./dockerfile-8.5-alpine -t colorcoding/tomcat:8.5-alpine ./
+docker build -f ./dockerfile-8.5-alpine -t colorcoding/tomcat:8.5-alpine ./
 ~~~
 * tomcat:8.5-wincore
 ~~~
 # certs目录为证书，脚本会自动注册
-docker build --force-rm -f ./dockerfile-8.5-wincore -t colorcoding/tomcat:8.5-wincore ./
+docker build -f ./dockerfile-8.5-wincore -t colorcoding/tomcat:8.5-wincore ./
 ~~~
 ### tomcat 9.0
 * tomcat:9.0-alpine
 ~~~
-docker build --force-rm -f ./dockerfile-9.0-alpine -t colorcoding/tomcat:9.0-alpine ./
+docker build -f ./dockerfile-9.0-alpine -t colorcoding/tomcat:9.0-alpine ./
 ~~~
 * tomcat:9.0-wincore
 ~~~
 # certs目录为证书，脚本会自动注册
-docker build --force-rm -f ./dockerfile-9.0-wincore -t colorcoding/tomcat:9.0-wincore ./
+docker build -f ./dockerfile-9.0-wincore -t colorcoding/tomcat:9.0-wincore ./
+~~~
+* tomcat:9.0-ubi-minimal
+~~~
+docker build -f ./dockerfile-9.0-ubi-minimal -t colorcoding/tomcat:9.0-ubi-minimal ./
 ~~~
 
 ## 鸣谢 | thanks

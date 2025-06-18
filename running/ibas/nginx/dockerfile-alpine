@@ -17,7 +17,7 @@ RUN set -x \
 
 # 下载并部署工具
 RUN set -x \
-    && curl -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
+    && curl --retry 3 -fsSL -o /tmp/btulz.scripts.tar http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.scripts/latest/btulz.scripts-latest.tar \
     && mkdir -p /tmp/btulz.scripts \
     && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
     && rm -f /tmp/btulz.scripts.tar \

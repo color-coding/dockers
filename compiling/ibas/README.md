@@ -4,15 +4,15 @@ ibas应用的编译环境或开发环境
 ## 编译容器 | building
 * compiling:ibas-alpine
 ~~~
-docker build --force-rm -f ./dockerfile-alpine -t colorcoding/compiling:ibas-alpine ./
+docker build -f ./dockerfile-alpine -t colorcoding/compiling:ibas-alpine ./
 ~~~
 * developing:ibas-ubuntu
 ~~~
-docker build --force-rm -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas-ubuntu ./
+docker build -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas-ubuntu ./
 ~~~
 * developing:ibas-ubuntu-kasm
 ~~~
-docker build --force-rm -f ./dockerfile-vscode-eclipse-kasm -t colorcoding/developing:ibas-ubuntu-kasm ./
+docker build -f ./dockerfile-vscode-eclipse-kasm -t colorcoding/developing:ibas-ubuntu-kasm ./
 ~~~
 
 ## 使用说明 | using

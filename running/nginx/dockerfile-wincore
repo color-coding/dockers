@@ -16,7 +16,7 @@ RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
     Remove-Item -Force -Recurse -LiteralPath 'C:\Certs\';
 
 # 安装Nginx
-ARG NGINX_VERSION=1.20.2
+ARG NGINX_VERSION=1.28.0
 ENV NGINX_HOME C:\\nginx
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri https://nginx.org/download/nginx-${Env:NGINX_VERSION}.zip -O nginx.zip; \
