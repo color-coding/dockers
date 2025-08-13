@@ -4,8 +4,8 @@ FROM alpine:3.13
 # 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
-ARG TARGETOS
-ARG TARGETARCH
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 ARG TARGETVARIANT
 
 # 安装环境
@@ -20,7 +20,7 @@ RUN set -x \
     && rm -rf /tmp/*.apk
 
 # 安装FileBrowser
-ARG FB_VERSION=v2.30.0
+ARG FB_VERSION=v2.42.3
 RUN set -x \
     # 下载文件
     && curl -LfsSo filebrowser.tar.gz https://github.com/filebrowser/filebrowser/releases/download/${FB_VERSION}/${TARGETOS}-${TARGETARCH}${TARGETVARIANT}-filebrowser.tar.gz \
