@@ -6,13 +6,9 @@ ibas应用的编译环境或开发环境
 ~~~
 docker build -f ./dockerfile-alpine -t colorcoding/compiling:ibas-alpine ./
 ~~~
-* developing:ibas-ubuntu
+* webtop:ibas-ubuntu
 ~~~
-docker build -f ./dockerfile-vscode-eclipse -t colorcoding/developing:ibas-ubuntu ./
-~~~
-* developing:ibas-ubuntu-kasm
-~~~
-docker build -f ./dockerfile-vscode-eclipse-kasm -t colorcoding/developing:ibas-ubuntu-kasm ./
+docker build -f ./dockerfile-vscode-eclipse -t colorcoding/webtop:ibas-ubuntu ./
 ~~~
 
 ## 使用说明 | using
@@ -20,13 +16,9 @@ docker build -f ./dockerfile-vscode-eclipse-kasm -t colorcoding/developing:ibas-
 ~~~
 docker run -it --rm colorcoding/compiling:ibas-alpine ash
 ~~~
-* developing:ibas-ubuntu
+* webtop:ibas-ubuntu
 ~~~
-docker run -d -p 80:80 colorcoding/developing:ibas-ubuntu
-~~~
-* developing:ibas-ubuntu-kasm
-~~~
-docker run --privileged=true -d -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock colorcoding/developing:ibas-ubuntu-kasm
+docker run -d -p 80:80 colorcoding/webtop:ibas-ubuntu
 ~~~
 
 ## 鸣谢 | thanks

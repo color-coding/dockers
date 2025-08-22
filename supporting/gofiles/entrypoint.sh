@@ -22,7 +22,8 @@ fi
 if [ ! -e /etc/filebrowser/database.db ]; then
     filebrowser config init
     filebrowser config set --commands "cd,ls,cp,mkdir,mv,rm,ln,cat,echo,touch,find,chmod,more,free,df,tar,unzip,unrar,curl,aria2c,ping,telnet,scp,ssh"
-    filebrowser users add "admin" "1q2w3e"
+    filebrowser config set --minimum-password-length 6
+    filebrowser users add "admin" "1q2w#E\$R"
 fi
 # filebrowser - a nas
 nohup filebrowser
