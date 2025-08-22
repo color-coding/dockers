@@ -10,16 +10,15 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    unzip dos2unix git nodejs npm \
+    unzip zip dos2unix git nodejs npm \
     # vscode依赖,tfs依赖
     libsecret-1-0 libnss3 gnupg libxss1 libxtst6 libkrb5-dev \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
 # jdk8
-ENV JAVA_VERSION=jdk8u412-b08_openj9-0.44.0
-ARG JAVA_ESUM=85af2c57078aab240ce31ba3f7a8e86696ff5bdf4c30f3c37f107986f07b23a6
-ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u412-b08_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_8u412b08_openj9-0.44.0.tar.gz'
+ARG JAVA_ESUM=1049c6fc42d2d590981c4932a82e985b279c450eabc37bb13415b346a4ebad11
+ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u452-b09_openj9-0.51.0/ibm-semeru-open-jdk_x64_linux_8u452b09_openj9-0.51.0.tar.gz'
 RUN set -x \
     && curl -LfsSo /tmp/openjdk.tar.gz ${JAVA_BINARY_URL} \
     && echo "${JAVA_ESUM} */tmp/openjdk.tar.gz" | sha256sum -c - \
@@ -31,8 +30,8 @@ ENV JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:$PATH"
 
 # maven
-ARG MAVEN_SHA=332088670d14fa9ff346e6858ca0acca304666596fec86eea89253bd496d3c90deae2be5091be199f48e09d46cec817c6419d5161fb4ee37871503f472765d00
-ARG MAVEN_BINARY_URL=https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
+ARG MAVEN_SHA=4a490b7f331a0e7869b61da24600241e445339f2801ed94e32f835b63ed78597ad05ef8c1cce2501b4c2c3dcde30030eb395cd5756be739c20ac687ad6f82f0e
+ARG MAVEN_BINARY_URL=https://archive.apache.org/dist/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz
 RUN set -x \
     && mkdir -p /usr/share/maven \
     && curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BINARY_URL} \

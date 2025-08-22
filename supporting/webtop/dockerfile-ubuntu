@@ -7,7 +7,7 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    curl aria2 iputils-ping \
+    curl aria2 iputils-ping p7zip-full \
     ttf-wqy-zenhei xarchiver thunar-archive-plugin \
     # 删除源
     && apt-get -y autoremove \

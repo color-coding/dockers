@@ -4,7 +4,7 @@ maven、docker等仓库管理器
 ## 编译容器 | building
 * nexus:latest
 ~~~
-docker build --rm -f ./dockerfile-ibm-semeru -t colorcoding/nexus:latest ./
+docker build -f ./dockerfile-ibm-semeru -t colorcoding/nexus:latest ./
 ~~~
 
 ## 使用说明 | using
