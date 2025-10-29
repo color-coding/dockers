@@ -3,8 +3,8 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u452-b09_openj9-0.51.0/ibm-semeru-open-jdk_x64_windows_8u452b09_openj9-0.51.0.msi
-ARG OPENJDK_SHA256=1f4deb5677bf7b58531eaac53976ee796d99913d3209a847ed7198fc2fcaef42
+ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u472-b08_openj9-0.56.0/ibm-semeru-open-jdk_x64_windows_8u472b08_openj9-0.56.0.msi
+ARG OPENJDK_SHA256=1841829d6d1fb55424f406f94dabd430c9736b1a1d6b880cab1f3ebc5caabc46
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
     IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \

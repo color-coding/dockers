@@ -17,8 +17,8 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/*
 
 # jdk8
-ARG JAVA_ESUM=1049c6fc42d2d590981c4932a82e985b279c450eabc37bb13415b346a4ebad11
-ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u452-b09_openj9-0.51.0/ibm-semeru-open-jdk_x64_linux_8u452b09_openj9-0.51.0.tar.gz'
+ARG JAVA_ESUM=e6c7faea4fc0bcf43b252621f8ec9b1bfcc4986f5fb914266e80f135d3139940
+ARG JAVA_BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u472-b08_openj9-0.56.0/ibm-semeru-open-jdk_x64_linux_8u472b08_openj9-0.56.0.tar.gz'
 RUN set -x \
     && curl -LfsSo /tmp/openjdk.tar.gz ${JAVA_BINARY_URL} \
     && echo "${JAVA_ESUM} */tmp/openjdk.tar.gz" | sha256sum -c - \
