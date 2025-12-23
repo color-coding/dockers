@@ -24,8 +24,10 @@ RUN Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releas
     IF ($proc.ExitCode -ne 0) { \
         Write-Host 'FAILED untar SCRIPTS!'; exit 1; \
     }; \
+    Copy-Item 'C:\temp\ibas\download_apps.bat' \"${Env:CATALINA_HOME}\"; \
     Copy-Item 'C:\temp\ibas\deploy_apps.bat' \"${Env:CATALINA_HOME}\"; \
     Copy-Item 'C:\temp\ibas\initialize_apps.bat' \"${Env:CATALINA_HOME}\"; \
+    Copy-Item 'C:\temp\ibas\update_routing.bat' \"${Env:CATALINA_HOME}\"; \
     Remove-Item -Force -LiteralPath 'C:\btulz.scripts.tar'; \
     Invoke-WebRequest -Uri "http://maven.colorcoding.org/repository/maven-releases/org/colorcoding/tools/btulz.transforms/${Env:BTULZ_TRANSFORMS_VERSION}/btulz.transforms-${Env:BTULZ_TRANSFORMS_VERSION}.tar" -OutFile 'C:\btulz.transforms.tar'; \
     $proc = Start-Process -FilePath "7z.exe" -ArgumentList 'x', 'C:\btulz.transforms.tar', '-oC:\temp\ibas_tools' -Wait -Passthru; $proc.WaitForExit(); \

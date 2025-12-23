@@ -36,6 +36,7 @@ RUN set -x \
     && mkdir -p /tmp/btulz.scripts \
     && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
     && rm -f /tmp/btulz.scripts.tar \
+    && cp -f /tmp/btulz.scripts/ibas/download_apps.sh ${CATALINA_HOME}/download_apps.sh \
     && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${CATALINA_HOME}/deploy_apps.sh \
     && cp -f /tmp/btulz.scripts/ibas/initialize_apps.sh ${CATALINA_HOME}/initialize_apps.sh \
     && cp -f /tmp/btulz.scripts/ibas/update_db.sh ${CATALINA_HOME}/update_db.sh \

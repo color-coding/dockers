@@ -21,6 +21,7 @@ RUN set -x \
     && mkdir -p /tmp/btulz.scripts \
     && tar -xvf /tmp/btulz.scripts.tar -C /tmp/btulz.scripts \
     && rm -f /tmp/btulz.scripts.tar \
+    && cp -f /tmp/btulz.scripts/ibas/download_apps.sh ${NGINX_HOME}/download_apps.sh \
     && cp -f /tmp/btulz.scripts/ibas/deploy_apps.sh ${NGINX_HOME}/deploy_apps.sh \
     && rm -rf /tmp/btulz.scripts
 
