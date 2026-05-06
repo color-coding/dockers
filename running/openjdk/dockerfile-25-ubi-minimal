@@ -1,4 +1,4 @@
-# (C) Copyright IBM Corporation 2021, 2025
+# (C) Copyright IBM Corporation 2025, 2025
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,34 +13,53 @@
 # limitations under the License.
 #
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS base-image
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
-RUN set -eux; \
-    microdnf install -y --nodocs --setopt=install_weak_deps=0 \
-        tzdata openssl ca-certificates fontconfig glibc-langpack-en gzip tar; \
-    microdnf clean all; \
-    rm -rf /var/cache/yum /var/tmp/* /tmp/*;
+RUN microdnf install -y \
+    # CRIU dependencies
+        iptables-libs iptables jansson libibverbs libmnl libnet libnftnl libpcap nftables protobuf-c \
+    # Semeru dependencies
+        tzdata openssl ca-certificates fontconfig glibc-langpack-en gzip tar \
+    # CRIU (public repository)
+        criu \
+    && microdnf update -y && microdnf clean all \
+    && rm -rf /var/cache/microdnf/*; \
+    # Update settings
+    mkdir -p /opt/criu; \
+    cp /usr/sbin/criu /opt/criu/criu 2>/dev/null || cp /usr/bin/criu /opt/criu/criu 2>/dev/null || true;
 
-LABEL name="IBM Semeru Runtime Open Edition" \
+LABEL name="IBM Semeru Runtime " \
       vendor="International Business Machines Corporation" \
-      version="jdk-8.0.492.0" \
-      release="8" \
-      maintainer="niuren.zhu@icloud.com" \
+      version="25.0.3.0" \
+      release="25" \
       run="docker run --rm -ti <image_name:tag> /bin/bash" \
-      summary="IBM Semeru Runtime Docker Image for OpenJDK with openj9 and ubi-minimal" \
+      summary="IBM Semeru Runtime Docker Image for OpenJDK with openj9 and ubi" \
       description="For more information on this image please see https://github.com/ibmruntimes/semeru-containers/blob/master/README.md"
 
-ENV JAVA_VERSION jdk-8.0.492.0
+ENV PATH="/usr/local/sbin:$PATH"
+ENV JAVA_VERSION 25.0.3.0
 
 RUN set -eux; \
     ARCH="$(uname -m)"; \
     case "${ARCH}" in \
-       amd64|x86_64) \
-         ESUM='d915dd88a5e7771dae953a91e1dd3b9d5d62998284fcfb2b1f12af1ca160f99a'; \
-         BINARY_URL='https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.492.0/ibm-semeru-open-jdk_x64_linux_8.0.492.0.tar.gz'; \
+       aarch64|arm64) \
+         ESUM='71eeef582242239a69a7432722e149785fa9071034dc69c4936c3302757e72e0'; \
+         BINARY_URL='https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-25.0.3.0/ibm-semeru-open-jdk_aarch64_linux_25.0.3.0.tar.gz'; \
          ;; \
+       amd64|x86_64) \
+         ESUM='1f844894d0b48dabbded9f93112752bd31ee0e76544c87742b641a389584fc81'; \
+         BINARY_URL='https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-25.0.3.0/ibm-semeru-open-jdk_x64_linux_25.0.3.0.tar.gz'; \
+         ;; \
+       ppc64el|ppc64le) \
+         ESUM='c69c0cbf41c31f43eb01ae881e6b9a364bc4c98da5896d93fa21125792aa15bf'; \
+         BINARY_URL='https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-25.0.3.0/ibm-semeru-open-jdk_ppc64le_linux_25.0.3.0.tar.gz'; \
+         ;; \
+       s390x) \
+         ESUM='0fcc79e84e8334ef6b970feb8cc21f54d33872f483d5ffa4a4b0b987bb93a333'; \
+         BINARY_URL='https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-25.0.3.0/ibm-semeru-open-jdk_s390x_linux_25.0.3.0.tar.gz'; \
+         ;;\
        *) \
          echo "Unsupported arch: ${ARCH}"; \
          exit 1; \
@@ -52,9 +71,8 @@ RUN set -eux; \
     cd /opt/java/openjdk; \
     tar -xf /tmp/openjdk.tar.gz --strip-components=1; \
     mkdir -p /licenses; \
-    cp /opt/java/openjdk/LICENSE /licenses; \
-    rm -rf /opt/java/openjdk/src.zip; \
-    rm -rf /opt/java/openjdk/sample; \
+    cp /opt/java/openjdk/legal/java.base/LICENSE /licenses; \
+    rm -rf /opt/java/openjdk/lib/src.zip; \
     rm -rf /tmp/openjdk.tar.gz;
 
 ENV JAVA_HOME=/opt/java/openjdk \
@@ -72,15 +90,16 @@ RUN set -eux; \
     SCC_SIZE="64m"; \
     DOWNLOAD_PATH_TOMCAT=/tmp/tomcat; \
     INSTALL_PATH_TOMCAT=/opt/tomcat-home; \
-    TOMCAT_CHECKSUM="904f10378ee2c7c68529edfefcba50c77eb677aa4586cfac0603e44703b0278f71f683b0295774f3cdcb027229d146490ef2c8868d8c2b5a631cf3db61ff9956"; \
-    TOMCAT_VERSION="9.0.105"; \
+    export CATALINA_PID=/opt/tomcat-home/tomcat.pid; \
+    TOMCAT_CHECKSUM="4ee77f604009daeab50d015835f221707f64a03756c6e5ac8736a6947cd60f6796315ceb255428765017038d79d466988582eb8b986dc48d3649bbc35bdd8bd7"; \
+    TOMCAT_VERSION="11.0.22"; \
     TOMCAT_FILENAME="apache-tomcat-${TOMCAT_VERSION}.tar.gz"; \
     SUCCESS=; \
     \
     mkdir -p "${DOWNLOAD_PATH_TOMCAT}" "${INSTALL_PATH_TOMCAT}"; \
     for baseUrl in \
-        https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin \
-        https://archive.apache.org/dist/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin \
+        https://dlcdn.apache.org/tomcat/tomcat-11/v${TOMCAT_VERSION}/bin \
+        https://archive.apache.org/dist/tomcat/tomcat-11/v${TOMCAT_VERSION}/bin \
     ; do \
         if curl -LfsSo "${DOWNLOAD_PATH_TOMCAT}"/tomcat.tar.gz "${baseUrl}/${TOMCAT_FILENAME}" && [ -s "${DOWNLOAD_PATH_TOMCAT}"/tomcat.tar.gz ]; then \
             SUCCESS=1; \
@@ -95,7 +114,7 @@ RUN set -eux; \
     java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version; \
     export OPENJ9_JAVA_OPTIONS="-XX:+IProfileDuringStartupPhase -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal"; \
     "${INSTALL_PATH_TOMCAT}"/bin/startup.sh; \
-    sleep 5; \
+    sleep 20; \
     "${INSTALL_PATH_TOMCAT}"/bin/shutdown.sh -force; \
     sleep 15; \
     FULL=$( (java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,printallStats 2>&1 || true) | awk '/^Cache is [0-9.]*% .*full/ {print substr($3, 1, length($3)-1)}'); \
@@ -109,14 +128,32 @@ RUN set -eux; \
     \
     export OPENJ9_JAVA_OPTIONS="-XX:+IProfileDuringStartupPhase -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal"; \
     "${INSTALL_PATH_TOMCAT}"/bin/startup.sh; \
-    sleep 5; \
+    sleep 20; \
     "${INSTALL_PATH_TOMCAT}"/bin/shutdown.sh -force; \
     sleep 5; \
     FULL=$( (java -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,printallStats 2>&1 || true) | awk '/^Cache is [0-9.]*% .*full/ {print substr($3, 1, length($3)-1)}'); \
     echo "SCC layer is $FULL% full."; \
     rm -rf "${INSTALL_PATH_TOMCAT}"; \
+    unset CATALINA_PID; \
     if [ -d "/opt/java/.scc" ]; then \
           chmod -R 0777 /opt/java/.scc; \
     fi; \
     \
     echo "SCC generation phase completed";
+
+FROM base-image AS instanton-ldconfig
+
+# For InstantOn, generate instanton.ld.so.cache which excludes glibc-hwcaps directories.
+# This is done in an intermediate stage to avoid modifying the base image.
+# ldconfig output example lines:
+#         libcap-ng.so.0 (libc6,64bit) => /lib64/libcap-ng.so.0
+#         libc_malloc_debug.so.0 (libc6,64bit, OS ABI: Linux 3.10.0) => /lib64/libc_malloc_debug.so.0
+#         libc.so.6 (libc6,64bit, hwcap: "power10", OS ABI: Linux 3.10.0) => /lib64/glibc-hwcaps/power10/libc.so.6
+# sed regexp filter should pass any line that looks as follows: ... => /.../glibc-hwcaps/...
+RUN glibc_hwcaps_dirs=$(ldconfig --print-cache | sed --regexp-extended --silent 's,^.+[[:space:]]+=>[[:space:]]+(/.+/glibc-hwcaps)/.+$,\1,p' | sort | uniq) \
+    && for d in $glibc_hwcaps_dirs; do rm -rf $d; done \
+    && ldconfig
+
+FROM base-image
+
+COPY --from=instanton-ldconfig /etc/ld.so.cache /etc/instanton.ld.so.cache

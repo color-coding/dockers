@@ -13,3 +13,7 @@ certs/
 
 # mac files
 .DS_Store
+
+# claude code
+.claude
+CLAUDE.md

@@ -32,6 +32,8 @@ if [ -e ${OPENJDK_FOLDER} ]; then
   cd ${OPENJDK_FOLDER}
   build "dockerfile-8-alpine" "colorcoding/openjdk:8-jdk-alpine" ""
   build "dockerfile-8-ubi-minimal" "colorcoding/openjdk:8-jdk-ubi-minimal" ""
+  build "dockerfile-25-alpine" "colorcoding/openjdk:25-jdk-alpine" ""
+  build "dockerfile-25-ubi-minimal" "colorcoding/openjdk:25-jdk-ubi-minimal" ""
 fi
 echo "---TOMCAT---"
 TOMCAT_FOLDER=${WORK_FOLDER}/tomcat
@@ -39,6 +41,8 @@ if [ -e ${TOMCAT_FOLDER} ]; then
   cd ${TOMCAT_FOLDER}
   build "dockerfile-9.0-alpine" "colorcoding/tomcat:9.0-alpine" ""
   build "dockerfile-9.0-ubi-minimal" "colorcoding/tomcat:9.0-ubi-minimal" ""
+  build "dockerfile-11-alpine" "colorcoding/tomcat:11-alpine" ""
+  build "dockerfile-11-ubi-minimal" "colorcoding/tomcat:11-ubi-minimal" ""
 fi
 echo "---TOMCAT(ibas)---"
 TOMCAT_FOLDER=${WORK_FOLDER}/ibas/tomcat

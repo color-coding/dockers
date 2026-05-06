@@ -1,0 +1,134 @@
+# 基于alpine构建tomcat镜像
+FROM colorcoding/openjdk:25-jdk-alpine
+
+# 维护者
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+ENV CATALINA_HOME /usr/local/tomcat
+ENV PATH $CATALINA_HOME/bin:$PATH
+RUN mkdir -p "$CATALINA_HOME"
+WORKDIR $CATALINA_HOME
+
+# let "Tomcat Native" live somewhere isolated
+ENV TOMCAT_NATIVE_LIBDIR $CATALINA_HOME/native-jni-lib
+ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$TOMCAT_NATIVE_LIBDIR
+
+# see https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/KEYS
+ENV GPG_KEYS 48F8E69F6390C9F25CFEDCD268248959359E722B A9C5DF4D22E99998D9875A5110C01C5A2F6059E7 DCFD35E0BF8CA7344752DE8B6FB21E8933C60243
+
+ENV TOMCAT_MAJOR 11
+ENV TOMCAT_VERSION 11.0.22
+ENV TOMCAT_SHA512 4ee77f604009daeab50d015835f221707f64a03756c6e5ac8736a6947cd60f6796315ceb255428765017038d79d466988582eb8b986dc48d3649bbc35bdd8bd7
+
+ENV TOMCAT_TGZ_URLS \
+	https://www.apache.org/dyn/closer.cgi?action=download&filename=tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+# if the version is outdated, we might have to pull from the dist/archive :/
+	https://www-us.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+	https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+	https://archive.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+
+ENV TOMCAT_ASC_URLS \
+	https://www.apache.org/dyn/closer.cgi?action=download&filename=tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc \
+# not all the mirrors actually carry the .asc files :/
+	https://www-us.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc \
+	https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc \
+	https://archive.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz.asc
+
+RUN set -eux; \
+	\
+	apk add --no-cache --virtual .fetch-deps \
+		gnupg \
+		ca-certificates \
+		openssl \
+		curl \
+	; \
+	ln -sf /usr/lib/libssl.so.3 /usr/lib/libssl.so && \
+	ln -sf /usr/lib/libcrypto.so.3 /usr/lib/libcrypto.so; \
+	\
+	export GNUPGHOME="$(mktemp -d)"; \
+	for key in $GPG_KEYS; do \
+		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
+	done; \
+	\
+	success=; \
+	for url in $TOMCAT_TGZ_URLS; do \
+		if curl -LfsSo tomcat.tar.gz "$url"; then \
+			success=1; \
+			break; \
+		fi; \
+	done; \
+	[ -n "$success" ]; \
+	\
+	echo "$TOMCAT_SHA512 *tomcat.tar.gz" | sha512sum -c -; \
+	\
+	success=; \
+	for url in $TOMCAT_ASC_URLS; do \
+		if curl -LfsSo tomcat.tar.gz.asc "$url"; then \
+			success=1; \
+			break; \
+		fi; \
+	done; \
+	[ -n "$success" ]; \
+	\
+	gpg --batch --verify tomcat.tar.gz.asc tomcat.tar.gz; \
+	tar -xvf tomcat.tar.gz --strip-components=1; \
+	rm bin/*.bat; \
+	rm tomcat.tar.gz*; \
+	command -v gpgconf && gpgconf --kill all || :; \
+	rm -rf "$GNUPGHOME"; \
+	\
+	nativeBuildDir="$(mktemp -d)"; \
+	tar -xvf bin/tomcat-native.tar.gz -C "$nativeBuildDir" --strip-components=1; \
+	apk add --no-cache --virtual .native-build-deps \
+		apr-dev \
+		coreutils \
+		dpkg-dev dpkg \
+		gcc \
+		libc-dev \
+		make \
+		openssl-dev \
+	; \
+	( \
+		export CATALINA_HOME="$PWD"; \
+		cd "$nativeBuildDir/native"; \
+		gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+		./configure \
+			--build="$gnuArch" \
+			--libdir="$TOMCAT_NATIVE_LIBDIR" \
+			--prefix="$CATALINA_HOME" \
+			--with-apr="$(which apr-1-config)" \
+			--with-java-home="$JAVA_HOME" \
+			--with-ssl=/usr; \
+		make -j "$(nproc)"; \
+		make install; \
+	); \
+	rm -rf "$nativeBuildDir"; \
+	rm bin/tomcat-native.tar.gz; \
+	\
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive "$TOMCAT_NATIVE_LIBDIR" \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --virtual .tomcat-native-rundeps $runDeps; \
+	apk del .fetch-deps .native-build-deps; \
+	\
+	apk add --no-cache bash; \
+	find ./bin/ -name '*.sh' -exec sed -ri 's|^#!/bin/sh$|#!/usr/bin/env bash|' '{}' +; \
+	\
+	chmod -R +rX .; \
+	chmod 777 logs work
+
+# verify Tomcat Native is working properly
+RUN set -eux; \
+	nativeLines="$(catalina.sh configtest 2>&1)"; \
+	nativeLines="$(echo "$nativeLines" | grep 'Apache Tomcat Native')"; \
+	nativeLines="$(echo "$nativeLines" | sort -u)"; \
+	if ! echo "$nativeLines" | grep -E 'INFO: Loaded( APR based)? Apache Tomcat Native library' >&2; then \
+		echo >&2 "$nativeLines"; \
+		exit 1; \
+	fi
+
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
