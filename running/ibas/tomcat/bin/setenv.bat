@@ -1,2 +1,2 @@
-rem 内存溢出后最退出，以便重启服务
+rem memory overflow than exit
 set JAVA_OPTS=-XX:+ExitOnOutOfMemoryError

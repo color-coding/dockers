@@ -22,15 +22,7 @@ docker build -f ./dockerfile-9.0-alpine -t colorcoding/tomcat:9.0-alpine ./
 # certs目录为证书，脚本会自动注册
 docker build -f ./dockerfile-9.0-wincore -t colorcoding/tomcat:9.0-wincore ./
 ~~~
-* tomcat:9.0-ubi-minimal
-~~~
-docker build -f ./dockerfile-9.0-ubi-minimal -t colorcoding/tomcat:9.0-ubi-minimal ./
-~~~
 ### tomcat 11
-* tomcat:11-alpine
-~~~
-docker build -f ./dockerfile-11-alpine -t colorcoding/tomcat:11-alpine ./
-~~~
 * tomcat:11-ubi-minimal
 ~~~
 docker build -f ./dockerfile-11-ubi-minimal -t colorcoding/tomcat:11-ubi-minimal ./
