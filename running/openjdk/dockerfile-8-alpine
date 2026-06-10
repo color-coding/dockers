@@ -135,3 +135,4 @@ RUN set -eux; \
     apk del --purge .scc-deps; \
     rm -rf /var/cache/apk/*; \
     echo "SCC generation phase completed";
+

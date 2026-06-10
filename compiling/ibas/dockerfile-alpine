@@ -12,8 +12,8 @@ RUN apk add --no-cache curl tar unzip git nodejs npm \
 ENV HOME /root
 
 # 安装Maven
-ARG MAVEN_SHA=4a490b7f331a0e7869b61da24600241e445339f2801ed94e32f835b63ed78597ad05ef8c1cce2501b4c2c3dcde30030eb395cd5756be739c20ac687ad6f82f0e
-ARG MAVEN_BINARY_URL=https://archive.apache.org/dist/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz
+ARG MAVEN_SHA=831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6
+ARG MAVEN_BINARY_URL=https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
 RUN set -x \
     && mkdir -p /usr/share/maven \
     && curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BINARY_URL} \
@@ -37,35 +37,4 @@ RUN set -x \
 ENV CODE_HOME=/root/codes
 RUN mkdir -p ${CODE_HOME}
 
-# 编译基本项目
-FROM builder as compiler
-# 维护者
-LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
-# 获取代码并编译
-RUN set -x \
-    && cd ${CODE_HOME} \
-    && git clone --depth 1 https://github.com/color-coding/ibas-framework.git \
-    && cd ibas-framework \
-    && ./compile_packages.sh
-# 获取代码并编译
-RUN set -x \
-    && cd ${CODE_HOME} \
-    && git clone --depth 1 https://github.com/color-coding/btulz.transforms.git \
-    && cd btulz.transforms \
-    && ./compile_packages.sh
-# 获取代码并编译
-RUN set -x \
-    && cd ${CODE_HOME} \
-    && git clone --depth 1 https://github.com/color-coding/ibas-typescript.git \
-    && cd ibas-typescript \
-    && ./compile_packages.sh
-
-# 清理ibas相关缓存
-RUN set -x \
-    && rm -rf ${MAVEN_REPOSITORY}/repository/org/colorcoding
-
-# 发布镜像
-FROM builder
-# 缓存maven仓库
-COPY --from=compiler ${MAVEN_REPOSITORY} ${MAVEN_REPOSITORY}
 WORKDIR ${CODE_HOME}

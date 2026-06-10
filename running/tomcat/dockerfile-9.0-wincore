@@ -7,18 +7,6 @@ LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 # 使用Powershell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# 安装证书（系统根证书已到期）
-# https://letsencrypt.org/certs/isrgrootx1.der
-# https://letsencrypt.org/certs/isrg-root-x2.der
-# https://letsencrypt.org/certs/lets-encrypt-r3.der
-COPY certs C:\\Certs
-RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
-        IF($_ -is [System.IO.FileInfo]) { \
-            Import-Certificate -FilePath $_.FullName -CertStoreLocation 'Cert:\LocalMachine\Root' ; \
-        } \
-    }; \
-    Remove-Item -Force -Recurse -LiteralPath 'C:\Certs\';
-
 # 安装TOMCAT
 ENV TOMCAT_MAJOR 9
 ENV TOMCAT_VERSION 9.0.118

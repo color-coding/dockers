@@ -6,6 +6,35 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.492.0/ibm-semeru-open-jdk_x64_windows_8.0.492.0.msi
 ARG OPENJDK_SHA256=4f53c0d00a0c68a4e3a224b618bb2eba23f85e1308948da5cefc503f309cffb3
 
+# Update Windows system root certificates before any Invoke-WebRequest calls.
+# servercore:ltsc2016 ships with outdated root certs (from 2016), missing modern roots like
+# ISRG Root X1 (Let's Encrypt), which causes SSL/TLS errors on many HTTPS sites.
+# Bypass SSL verification to download Mozilla CA bundle first, then import roots into Windows cert store.
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; \
+    $wc = New-Object System.Net.WebClient ; \
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true } ; \
+    $wc.DownloadFile('https://curl.se/ca/cacert.pem', 'C:\cacert.pem') ; \
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null ; \
+    $content = Get-Content 'C:\cacert.pem' -Raw ; \
+    $certs = [regex]::Matches($content, '-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----') ; \
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('Root','LocalMachine') ; \
+    $store.Open('ReadWrite') ; \
+    foreach ($match in $certs) { \
+      try { \
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 ; \
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($match.Value) ; \
+        $cert.Import($bytes) ; \
+        if ($cert.NotBefore -le [DateTime]::UtcNow -and $cert.NotAfter -ge [DateTime]::UtcNow) { \
+          $existing = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $cert.Thumbprint, $false) ; \
+          if ($existing.Count -eq 0) { $store.Add($cert) } \
+        } \
+        $cert.Dispose() ; \
+      } catch { } \
+    } ; \
+    $store.Close() ; \
+    Remove-Item 'C:\cacert.pem' -Force ; \
+    Write-Host 'Windows system root certificates updated'
+
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
     IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \
     Write-Host 'Verifying sha256 FAILED!'; exit 1; \
@@ -22,3 +51,57 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Remove-Item openjdk.msi -Force;
 
 ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,nonFatal"
+
+# Create OpenJ9 SharedClassCache (SCC) for bootclasses to improve the java startup.
+# Downloads and runs tomcat to generate SCC for bootclasses at C:\Windows\Temp\.scc\openj9_system_scc
+# Does a dry-run and calculates the optimal cache size and recreates the cache with the appropriate size.
+# With SCC, OpenJ9 startup is improved ~50% with an increase in image size of ~14MB
+# Application classes can be create a separate cache layer with this as the base for further startup improvement
+RUN $env:OPENJ9_JAVA_OPTIONS = '' ; \
+    $SCC_SIZE = '64m' ; \
+    $DOWNLOAD_PATH_TOMCAT = 'C:\temp\tomcat' ; \
+    $INSTALL_PATH_TOMCAT = 'C:\tomcat-home' ; \
+    $TOMCAT_DWNLD_URL = 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.105/bin/apache-tomcat-9.0.105-windows-x64.zip' ; \
+    $TOMCAT_CHECKSUM = 'eea07407494f879dfd49f37ade1e5b6ce6b6c51b3a17cb48e676cbfb4f4a014ff94c6eb8a191978f6d8f80b297eb2736d93598dff7c69c89fd5427c3be6a3d4e' ; \
+    \
+    New-Item -ItemType Directory -Path $DOWNLOAD_PATH_TOMCAT -Force | Out-Null ; \
+    New-Item -ItemType Directory -Path $INSTALL_PATH_TOMCAT -Force | Out-Null ; \
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; \
+    Invoke-WebRequest -Uri $TOMCAT_DWNLD_URL -OutFile "$DOWNLOAD_PATH_TOMCAT\apache-tomcat.zip" ; \
+    \
+    $hash = (Get-FileHash -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat.zip" -Algorithm SHA512).Hash.ToLower() ; \
+    if ($hash -ne $TOMCAT_CHECKSUM.ToLower()) { Write-Host 'Verifying sha512 FAILED!'; exit 1 } ; \
+    \
+    Expand-Archive -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat.zip" -DestinationPath $DOWNLOAD_PATH_TOMCAT -Force ; \
+    Move-Item -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat-9.0.105-windows-x64\*" -Destination $INSTALL_PATH_TOMCAT -Force ; \
+    Remove-Item -Path $DOWNLOAD_PATH_TOMCAT -Force -Recurse ; \
+    \
+    & java -Xshareclasses:name=dry_run_scc,cacheDir=C:\Windows\Temp\.scc\,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version ; \
+    $env:OPENJ9_JAVA_OPTIONS = '-Xshareclasses:name=dry_run_scc,cacheDir=C:\Windows\Temp\.scc\,bootClassesOnly,nonFatal' ; \
+    & "$INSTALL_PATH_TOMCAT\bin\startup.bat" ; \
+    Start-Sleep -Seconds 5 ; \
+    & "$INSTALL_PATH_TOMCAT\bin\shutdown.bat" ; \
+    Start-Sleep -Seconds 15 ; \
+    \
+    $dryRunOutput = & java -Xshareclasses:name=dry_run_scc,cacheDir=C:\Windows\Temp\.scc\,printallStats 2>&1 ; \
+    $FULL = 0 ; \
+    foreach ($line in $dryRunOutput) { if ($line -match '^Cache is ([0-9.]+)% .*full') { $FULL = $Matches[1]; break } } ; \
+    & java -Xshareclasses:name=dry_run_scc,cacheDir=C:\Windows\Temp\.scc\,destroy 2>&1 | Out-Null ; \
+    $SCC_NUM = [int]([int]$SCC_SIZE.Substring(0,$SCC_SIZE.Length-1) * [double]$FULL / 100.0) ; \
+    if ($SCC_NUM -eq 0) { $SCC_NUM = 1 } ; \
+    $SCC_SIZE = "${SCC_NUM}m" ; \
+    \
+    & java -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version ; \
+    $env:OPENJ9_JAVA_OPTIONS = '-Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,bootClassesOnly,nonFatal' ; \
+    & "$INSTALL_PATH_TOMCAT\bin\startup.bat" ; \
+    Start-Sleep -Seconds 5 ; \
+    & "$INSTALL_PATH_TOMCAT\bin\shutdown.bat" ; \
+    Start-Sleep -Seconds 5 ; \
+    $sccOutput = & java -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,printallStats 2>&1 ; \
+    $FULL = 0 ; \
+    foreach ($line in $sccOutput) { if ($line -match '^Cache is ([0-9.]+)% .*full') { $FULL = $Matches[1]; break } } ; \
+    Write-Host "SCC layer is $FULL% full." ; \
+    Remove-Item -Path $INSTALL_PATH_TOMCAT -Force -Recurse ; \
+    $sccDir = 'C:\Windows\Temp\.scc' ; \
+    if (Test-Path $sccDir) { Get-ChildItem -Path $sccDir -Recurse | ForEach-Object { $_.Attributes = 'Normal' } } ; \
+    Write-Host 'SCC generation phase completed'

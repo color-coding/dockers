@@ -4,19 +4,33 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # 安装证书（系统根证书已到期）
-# https://letsencrypt.org/certs/isrgrootx1.der
-# https://letsencrypt.org/certs/isrg-root-x2.der
-# https://letsencrypt.org/certs/lets-encrypt-r3.der
-COPY certs C:\\Certs
-RUN Get-ChildItem 'C:\Certs' | ForEach-Object -Process { \
-    IF($_ -is [System.IO.FileInfo]) { \
-    Import-Certificate -FilePath $_.FullName -CertStoreLocation 'Cert:\LocalMachine\Root' ; \
-    } \
-    }; \
-    Remove-Item -Force -Recurse -LiteralPath 'C:\Certs\';
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; \
+    $wc = New-Object System.Net.WebClient ; \
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true } ; \
+    $wc.DownloadFile('https://curl.se/ca/cacert.pem', 'C:\cacert.pem') ; \
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null ; \
+    $content = Get-Content 'C:\cacert.pem' -Raw ; \
+    $certs = [regex]::Matches($content, '-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----') ; \
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('Root','LocalMachine') ; \
+    $store.Open('ReadWrite') ; \
+    foreach ($match in $certs) { \
+      try { \
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 ; \
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($match.Value) ; \
+        $cert.Import($bytes) ; \
+        if ($cert.NotBefore -le [DateTime]::UtcNow -and $cert.NotAfter -ge [DateTime]::UtcNow) { \
+          $existing = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $cert.Thumbprint, $false) ; \
+          if ($existing.Count -eq 0) { $store.Add($cert) } \
+        } \
+        $cert.Dispose() ; \
+      } catch { } \
+    } ; \
+    $store.Close() ; \
+    Remove-Item 'C:\cacert.pem' -Force ; \
+    Write-Host 'Windows system root certificates updated'
 
 # 安装Nginx
-ARG NGINX_VERSION=1.30.1
+ARG NGINX_VERSION=1.30.2
 ENV NGINX_HOME C:\\nginx
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri https://nginx.org/download/nginx-${Env:NGINX_VERSION}.zip -O nginx.zip; \
