@@ -11,9 +11,9 @@ docker build -f ./dockerfile-8-alpine -t colorcoding/openjdk:8-jdk-alpine ./
 ~~~
 docker build -f ./dockerfile-8-wincore -t colorcoding/openjdk:8-jdk-wincore ./
 ~~~
-* openjdk:25-jdk-ubi-minimal
+* openjdk:21-jdk-ubi-minimal
 ~~~
-docker build -f ./dockerfile-25-ubi-minimal -t colorcoding/openjdk:25-jdk-ubi-minimal ./
+docker build -f ./dockerfile-21-ubi-minimal -t colorcoding/openjdk:21-jdk-ubi-minimal ./
 ~~~
 
 ## 鸣谢 | thanks

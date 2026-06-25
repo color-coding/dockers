@@ -30,7 +30,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Write-Host 'Windows system root certificates updated'
 
 # 安装Nginx
-ARG NGINX_VERSION=1.30.2
+ARG NGINX_VERSION=1.30.4
 ENV NGINX_HOME C:\\nginx
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -Uri https://nginx.org/download/nginx-${Env:NGINX_VERSION}.zip -O nginx.zip; \

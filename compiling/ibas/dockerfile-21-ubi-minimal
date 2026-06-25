@@ -1,57 +1,46 @@
-# 构建运行环境（alpine）
-FROM colorcoding/openjdk:8-jdk-alpine as builder
+# Java 21 + Maven 编译环境（UBI minimal）
+FROM colorcoding/openjdk:21-jdk-ubi-minimal AS builder
 
-# 维护者
 LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
 
-# 安装环境
-RUN apk add --no-cache bash curl tar unzip git nodejs npm \
-    && rm -rf /var/cache/apk/ \
-    && rm -rf /tmp/*.apk
+RUN microdnf install -y unzip git nodejs npm shadow-utils \
+    && microdnf clean all \
+    && rm -rf /var/cache/yum
 
 # 可通过 build-arg 使用宿主机的用户名、UID 和 GID，避免运行时出现无名用户。
 ARG CODER_NAME=coder
 ARG CODER_UID=1000
 ARG CODER_GID=1000
-RUN addgroup -S -g ${CODER_GID} ${CODER_NAME} \
-    && adduser -S -D -u ${CODER_UID} -G ${CODER_NAME} -h /home/${CODER_NAME} -s /bin/bash ${CODER_NAME}
+RUN groupadd --gid ${CODER_GID} ${CODER_NAME} \
+    && useradd --uid ${CODER_UID} --gid ${CODER_GID} --create-home --home-dir /home/${CODER_NAME} --shell /bin/bash ${CODER_NAME}
 
 ENV HOME=/home/${CODER_NAME}
 ENV CODE_HOME=/home/${CODER_NAME}/codes
 
 # Bash交互配置：显示当前目录，并启用大小写不敏感的Tab补全
 RUN printf '%s\n' "PS1='\\u@\\h:\\w\\$ '" > ${HOME}/.bashrc \
-    && printf '%s\n' 'set completion-ignore-case on' > ${HOME}/.inputrc \
-    && chmod 644 ${HOME}/.bashrc ${HOME}/.inputrc
+    && printf '%s\n' 'set completion-ignore-case on' > ${HOME}/.inputrc
 
-# 安装Maven
 ARG MAVEN_SHA=831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6
 ARG MAVEN_BINARY_URL=https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
-RUN set -x \
-    && mkdir -p /usr/share/maven \
-    && curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BINARY_URL} \
+RUN mkdir -p /usr/share/maven \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz "${MAVEN_BINARY_URL}" \
     && echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - \
     && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
     && rm -f /tmp/apache-maven.tar.gz \
     && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
-ENV MAVEN_HOME /usr/share/maven
-ENV MAVEN_REPOSITORY ${HOME}/.m2/repository
+
+ENV MAVEN_HOME=/usr/share/maven
+ENV MAVEN_REPOSITORY=${HOME}/.m2/repository
 RUN awk '/<mirror[[:space:]>]/ { in_mirror=1; mirror="" } in_mirror { mirror=mirror $0 ORS; if (/<\/mirror>/) { if (mirror !~ /<id>[[:space:]]*maven-default-http-blocker[[:space:]]*<\/id>/) printf "%s", mirror; in_mirror=0; mirror="" } next } { print }' ${MAVEN_HOME}/conf/settings.xml > /tmp/settings.xml \
     && cat /tmp/settings.xml > ${MAVEN_HOME}/conf/settings.xml \
     && rm -f /tmp/settings.xml
 
-
-# 环境变量-typescript版本
 ARG TS_VERSION=3.9.10
-# 安装Node环境
-RUN set -x \
-    && npm install -g typescript@${TS_VERSION} \
-    && npm install -g uglify-es \
+RUN npm install -g typescript@${TS_VERSION} uglify-es \
     && npm cache clean --force \
-    && rm -rf /root/.npm
-
-# 环境变量-代码目录
-RUN mkdir -p ${CODE_HOME} ${HOME}/.m2 \
+    && rm -rf /root/.npm \
+    && mkdir -p ${CODE_HOME} ${HOME}/.m2 \
     && chown -R ${CODER_NAME}:${CODER_NAME} ${HOME}
 
 WORKDIR ${CODE_HOME}
