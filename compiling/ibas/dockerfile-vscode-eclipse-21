@@ -1,0 +1,140 @@
+# IBAS amd64 开发桌面：IBM Semeru/OpenJ9 21、VS Code 和 Eclipse IDE for Enterprise Java and Web Developers
+FROM colorcoding/webtop:ubuntu
+
+LABEL maintainer="Niuren.Zhu <niuren.zhu@icloud.com>"
+
+USER root
+
+RUN set -eux \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        unzip zip dos2unix git nodejs npm \
+        libsecret-1-0 libnss3 gnupg libxss1 libxtst6 libkrb5-dev \
+        libgl1 libgbm1 dbus-x11 \
+    && rm -rf /var/lib/apt/lists/*
+
+# IBM Semeru/OpenJ9 JDK 21；校验值及下载地址与 running/openjdk/dockerfile-21-ubi-minimal 保持一致。
+ARG JAVA_VERSION=21.0.3.9
+RUN set -eux; \
+    ARCH="$(uname -m)"; \
+    case "${ARCH}" in \
+       amd64|x86_64) \
+         ESUM='5cccb39dc7ca6c61a11bd7179c4c3c30b747f9f22129576feef921b59725af25'; \
+         BINARY_URL='https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.3%2B9_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_21.0.3_9_openj9-0.44.0.tar.gz'; \
+         ;; \
+       *) echo "Unsupported arch: ${ARCH}; this image only supports amd64"; exit 1 ;; \
+    esac; \
+    curl -LfsSo /tmp/openjdk.tar.gz "${BINARY_URL}"; \
+    echo "${ESUM}  /tmp/openjdk.tar.gz" | sha256sum -c -; \
+    mkdir -p /opt/java/openjdk /opt/java/.scc; \
+    tar -xf /tmp/openjdk.tar.gz -C /opt/java/openjdk --strip-components=1; \
+    rm -f /opt/java/openjdk/lib/src.zip /tmp/openjdk.tar.gz
+
+ENV JAVA_HOME=/opt/java/openjdk \
+    PATH="/opt/java/openjdk/bin:${PATH}" \
+    JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+PortableSharedCache -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,readonly,nonFatal"
+
+# Maven
+ARG MAVEN_SHA=831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6
+ARG MAVEN_BINARY_URL=https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
+RUN set -eux \
+    && mkdir -p /usr/share/maven \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz "${MAVEN_BINARY_URL}" \
+    && echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - \
+    && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+    && rm -f /tmp/apache-maven.tar.gz \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+ENV MAVEN_HOME=/usr/share/maven
+RUN awk '/<mirror[[:space:]>]/ { in_mirror=1; mirror="" } in_mirror { mirror=mirror $0 ORS; if (/<\/mirror>/) { if (mirror !~ /<id>[[:space:]]*maven-default-http-blocker[[:space:]]*<\/id>/) printf "%s", mirror; in_mirror=0; mirror="" } next } { print }' "${MAVEN_HOME}/conf/settings.xml" > /tmp/settings.xml \
+    && cat /tmp/settings.xml > "${MAVEN_HOME}/conf/settings.xml" \
+    && rm -f /tmp/settings.xml
+
+# TypeScript
+RUN set -eux \
+    && npm install -g --no-audit --no-fund typescript@3.9.10 uglify-es \
+    && npm cache clean --force \
+    && rm -rf /root/.npm
+
+# VS Code 1.109.5
+ARG VSCODE_VERSION=1.109.5
+RUN set -eux \
+    && curl -LfsSo /tmp/vscode_amd64.deb "https://update.code.visualstudio.com/${VSCODE_VERSION}/linux-deb-x64/stable" \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/vscode_amd64.deb \
+    && rm -f /tmp/vscode_amd64.deb \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN printf '%s\n' \
+    '[Desktop Entry]' \
+    'Name=Visual Studio Code' \
+    'Comment=Code Editing. Redefined.' \
+    'Exec=/usr/share/code/code --no-sandbox --disable-gpu --user-data-dir=/home/headless/.config/Code --unity-launch %F' \
+    'Icon=/usr/share/code/resources/app/resources/linux/code.png' \
+    'Type=Application' \
+    'Terminal=false' \
+    'StartupNotify=false' \
+    'StartupWMClass=Code' \
+    'Categories=Development;IDE;' \
+    > /usr/share/applications/code.desktop \
+    && printf '%s\n' '#!/bin/sh' 'exec /usr/bin/code --user-data-dir="${HOME}/.config/Code" --no-sandbox --disable-gpu "$@"' > /usr/local/bin/code \
+    && chmod 755 /usr/local/bin/code
+
+# Eclipse IDE 2024-03。JustJ 自带运行时位于 plugins 中，替换为上面的 JDK，避免重复保留一份 JRE。
+ARG ECLIPSE_VERSION=2024-03
+RUN set -eux \
+    && curl -LfsSo /tmp/eclipse.tar.gz "https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/${ECLIPSE_VERSION}/R/eclipse-jee-${ECLIPSE_VERSION}-R-linux-gtk-x86_64.tar.gz" \
+    && mkdir -p /usr/share/eclipse \
+    && tar --warning=no-unknown-keyword --no-same-owner -xf /tmp/eclipse.tar.gz -C /usr/share/eclipse --strip-components=1 \
+    && ECLIPSE_JRE="$(find /usr/share/eclipse/plugins -type d -path '*/org.eclipse.justj.openjdk*.jre.*/*' -name jre -print -quit)" \
+    && test -n "${ECLIPSE_JRE}" \
+    && rm -rf "${ECLIPSE_JRE}" /tmp/eclipse.tar.gz \
+    && ln -s "${JAVA_HOME}" "${ECLIPSE_JRE}"
+
+RUN printf '%s\n' \
+    '[Desktop Entry]' \
+    'Name=Eclipse' \
+    'Comment=Eclipse' \
+    'Exec=/usr/share/eclipse/eclipse' \
+    'Icon=/usr/share/eclipse/icon.xpm' \
+    'Terminal=false' \
+    'Type=Application' \
+    'Categories=Development;IDE;' \
+    'StartupNotify=false' \
+    > /usr/share/applications/eclipse.desktop
+
+# TFS Eclipse 插件与命令行工具
+ARG TEE_VERSION=14.139.0
+RUN set -eux \
+    && curl -LfsSo /tmp/TFSEclipsePlugin.zip "https://github.com/microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TFSEclipsePlugin-UpdateSiteArchive-${TEE_VERSION}.zip" \
+    && unzip -o /tmp/TFSEclipsePlugin.zip -d /tmp/TFSEclipsePlugin \
+    && mv /tmp/TFSEclipsePlugin/features/*.jar /usr/share/eclipse/features/ \
+    && mv /tmp/TFSEclipsePlugin/plugins/*.jar /usr/share/eclipse/plugins/ \
+    && rm -rf /tmp/TFSEclipsePlugin.zip /tmp/TFSEclipsePlugin \
+    && curl -LfsSo /tmp/TEE-CLC.zip "https://github.com/microsoft/team-explorer-everywhere/releases/download/${TEE_VERSION}/TEE-CLC-${TEE_VERSION}.zip" \
+    && unzip -o /tmp/TEE-CLC.zip -d /usr/share/ \
+    && ln -s "/usr/share/TEE-CLC-${TEE_VERSION}/tf" /usr/bin/tf \
+    && rm -f /tmp/TEE-CLC.zip
+ENV TF_CLC_HOME=/usr/share/TEE-CLC-${TEE_VERSION}/
+
+# 用户级 VS Code 设置：禁用遥测、自动更新及不必要的文件监控。
+RUN set -eux \
+    && mkdir -p "${HOME}/.config/Code/User" "${HOME}/.cache" "${HOME}/.local" "${HOME}/.npm" \
+    && printf '%s\n' \
+        '{' \
+        '  "telemetry.telemetryLevel": "off",' \
+        '  "update.mode": "none",' \
+        '  "extensions.autoUpdate": false,' \
+        '  "typescript.tsdk": "/usr/local/lib/node_modules/typescript/lib",' \
+        '  "security.workspace.trust.enabled": false,' \
+        '  "editor.minimap.enabled": false,' \
+        '  "workbench.settings.enableNaturalLanguageSearch": false,' \
+        '  "files.watcherExclude": {' \
+        '    "**/node_modules/**": true,' \
+        '    "**/.venv/**": true,' \
+        '    "**/__pycache__/**": true' \
+        '  }' \
+        '}' > "${HOME}/.config/Code/User/settings.json" \
+    && chown -R "${HEADLESS_USER_ID}:${HEADLESS_USER_GROUP_ID}" "${HOME}/.config/Code" "${HOME}/.cache" "${HOME}/.local" "${HOME}/.npm" \
+    && "${STARTUPDIR}"/set_user_permissions.sh "${HOME}"
+
+USER "${HEADLESS_USER_ID}"
