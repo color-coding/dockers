@@ -1,27 +1,68 @@
-# 基于镜像ubuntu
 FROM accetto/ubuntu-vnc-xfce-firefox-g3:20.04
 
 USER root
-# 安装常用软件
-RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-    curl aria2 iputils-ping p7zip-full \
-    ttf-wqy-zenhei xarchiver thunar-archive-plugin \
-    # 删除源
-    && apt-get -y autoremove \
-    && rm -rf /var/lib/apt/lists/*
-# 设置系统权限
-RUN set -x \
-    && filePath=$(which python3) \
-    && if [ -L $filePath ]; then filePath=$(readlink -f $filePath); fi \
-    && if [ -e $filePath ]; then setcap "cap_net_bind_service=+eip" $filePath; fi
 
-# 调整参数
-ENV NOVNC_PORT=80 \
+# 安装常用软件
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && apt-get install -y --no-install-recommends \
+    curl aria2 iputils-ping p7zip-full libglib2.0-bin \
+    ibus ibus-pinyin ibus-gtk ibus-gtk3 iso-codes \
+    ttf-wqy-zenhei xarchiver thunar-archive-plugin \
+    && rm -rf /var/lib/apt/lists/*
+
+# 配置中文输入法：XFCE 会话启动 IBus，仅启用系统英文键盘和拼音
+RUN set -x \
+    && printf '%s\n' \
+    '#!/bin/sh' \
+    'set -eu' \
+    'if ! pgrep -u "$(id -u)" -x ibus-daemon >/dev/null 2>&1; then' \
+    '    ibus-daemon --xim --daemonize' \
+    'fi' \
+    'attempt=0' \
+    'while ! ibus list-engine >/dev/null 2>&1 && [ "$attempt" -lt 10 ]; do' \
+    '    sleep 1' \
+    '    attempt=$((attempt + 1))' \
+    'done' \
+    'if ibus list-engine | grep -q "^[[:space:]]*pinyin[[:space:]]"; then' \
+    '    gsettings reset org.freedesktop.ibus.general engines-order || true' \
+    '    gsettings reset org.freedesktop.ibus.general preload-engines || true' \
+    '    gsettings set org.freedesktop.ibus.general engines-order "['"'"'xkb:us::eng'"'"', '"'"'pinyin'"'"']"' \
+    '    gsettings set org.freedesktop.ibus.general preload-engines "['"'"'xkb:us::eng'"'"', '"'"'pinyin'"'"']"' \
+    '    ibus engine xkb:us::eng' \
+    'fi' \
+    > /usr/local/bin/ibus-start.sh \
+    && chmod 755 /usr/local/bin/ibus-start.sh \
+    && printf '%s\n' \
+    '[Desktop Entry]' \
+    'Type=Application' \
+    'Name=IBus' \
+    'Comment=Start IBus input method' \
+    'Exec=/usr/local/bin/ibus-start.sh' \
+    'Terminal=false' \
+    'OnlyShowIn=XFCE;' \
+    'X-GNOME-Autostart-enabled=true' \
+    > /etc/xdg/autostart/ibus.desktop
+
+ENV GTK_IM_MODULE=ibus \
+    QT_IM_MODULE=ibus \
+    XMODIFIERS=@im=ibus \
+    XDG_RUNTIME_DIR=/run/user/${HEADLESS_USER_ID} \
+    VNC_PORT=5902 \
+    NOVNC_PORT=5901 \
     TINI_SUBREAPER=1
 
-EXPOSE ${NOVNC_PORT}
+# 固定用户权限，避免 CF 启动时执行上游 UID/GID 重写流程。
+# CF 运行时不是 root，因此在构建阶段提前建立 UID 到用户名的映射，
+# 让 noVNC/TigerVNC 不会把桌面名称显示成纯数字 UID。
+RUN rm -f /dockerstartup/.initial_sudo_password \
+    && if ! getent passwd "${HEADLESS_USER_ID}" >/dev/null 2>&1; then \
+        printf 'headless:x:%s:%s:Headless User:%s:/bin/bash\n' \
+            "${HEADLESS_USER_ID}" "${HEADLESS_USER_GROUP_ID}" "${HOME}" >> /etc/passwd; \
+    fi \
+    && chown -R "${HEADLESS_USER_ID}:${HEADLESS_USER_GROUP_ID}" /dockerstartup "${HOME}" \
+    && install -d -m 700 -o "${HEADLESS_USER_ID}" -g "${HEADLESS_USER_GROUP_ID}" \
+        "/run/user/${HEADLESS_USER_ID}"
 
 USER "${HEADLESS_USER_ID}"
+
+EXPOSE ${NOVNC_PORT}

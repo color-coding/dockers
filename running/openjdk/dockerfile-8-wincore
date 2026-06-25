@@ -3,8 +3,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.492.0/ibm-semeru-open-jdk_x64_windows_8.0.492.0.msi
-ARG OPENJDK_SHA256=4f53c0d00a0c68a4e3a224b618bb2eba23f85e1308948da5cefc503f309cffb3
+ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.502.0/ibm-semeru-open-jdk_x64_windows_8.0.502.0.msi
 
 # Update Windows system root certificates before any Invoke-WebRequest calls.
 # servercore:ltsc2016 ships with outdated root certs (from 2016), missing modern roots like
@@ -36,9 +35,10 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Write-Host 'Windows system root certificates updated'
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; Invoke-WebRequest -Uri ${Env:OPENJDK_URL} -O 'openjdk.msi' ; \
-    IF ((Get-FileHash openjdk.msi -Algorithm sha256).Hash -ne ${Env:OPENJDK_SHA256}) { \
-    Write-Host 'Verifying sha256 FAILED!'; exit 1; \
-    }; \
+    Invoke-WebRequest -Uri "${Env:OPENJDK_URL}.sha256.txt" -O 'openjdk.sha256' ; \
+    $expected = (Get-Content openjdk.sha256 -Raw).Split()[0].ToUpperInvariant() ; \
+    $actual = (Get-FileHash openjdk.msi -Algorithm sha256).Hash.ToUpperInvariant() ; \
+    IF ($actual -ne $expected) { Write-Host 'Verifying sha256 FAILED!'; exit 1; }; \
     New-Item -ItemType Directory -Path C:\temp | Out-Null; \
     Write-Host 'Installing using MSI ...'; \
     $proc = Start-Process -FilePath "msiexec.exe" -ArgumentList '/i', 'openjdk.msi', '/L*V', 'C:\temp\OpenJDK.log', \
@@ -48,7 +48,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Write-Host 'FAILED installing MSI!' ; exit 1; \
     }; \
     Remove-Item -Path C:\temp -Force -Recurse | Out-Null; \
-    Remove-Item openjdk.msi -Force;
+    Remove-Item openjdk.msi,openjdk.sha256 -Force;
 
 ENV JAVA_TOOL_OPTIONS="-XX:+IgnoreUnrecognizedVMOptions -XX:+IdleTuningGcOnIdle -Xshareclasses:name=openj9_system_scc,cacheDir=C:\Windows\Temp\.scc\,nonFatal"
 

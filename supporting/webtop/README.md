@@ -10,7 +10,7 @@ docker build -f ./dockerfile-ubuntu -t colorcoding/webtop:ubuntu ./
 ## 使用说明 | using
 * webtop:ubuntu
 ~~~
-docker run --rm -d -p 80:80 colorcoding/webtop:ubuntu
+docker run --rm -d -p 80:5901 colorcoding/webtop:ubuntu
 ~~~
 
 ## 鸣谢 | thanks
