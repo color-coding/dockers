@@ -15,6 +15,8 @@
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS base-image
 
+ARG JAVA_VERSION=21.0.12.15
+
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 RUN microdnf install -y \
@@ -32,48 +34,46 @@ RUN microdnf install -y \
 
 LABEL name="IBM Semeru Runtime " \
       vendor="International Business Machines Corporation" \
-      version="21.0.3.9" \
+      version="${JAVA_VERSION}" \
       release="21" \
       run="docker run --rm -ti <image_name:tag> /bin/bash" \
       summary="IBM Semeru Runtime Docker Image for OpenJDK with openj9 and ubi" \
       description="For more information on this image please see https://github.com/ibmruntimes/semeru-containers/blob/master/README.md"
 
 ENV PATH="/usr/local/sbin:$PATH"
-ENV JAVA_VERSION 21.0.3.9
+ENV JAVA_VERSION=${JAVA_VERSION}
 
 RUN set -eux; \
     ARCH="$(uname -m)"; \
     case "${ARCH}" in \
        aarch64|arm64) \
-         ESUM='718e465d1b22034d889445e8ae371fc58dfc733c454cf344fa5e10db0ab8a775'; \
-         BINARY_URL='https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.3%2B9_openj9-0.44.0/ibm-semeru-open-jdk_aarch64_linux_21.0.3_9_openj9-0.44.0.tar.gz'; \
+         BINARY_ARCH='aarch64'; \
          ;; \
        amd64|x86_64) \
-         ESUM='5cccb39dc7ca6c61a11bd7179c4c3c30b747f9f22129576feef921b59725af25'; \
-         BINARY_URL='https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.3%2B9_openj9-0.44.0/ibm-semeru-open-jdk_x64_linux_21.0.3_9_openj9-0.44.0.tar.gz'; \
+         BINARY_ARCH='x64'; \
          ;; \
        ppc64el|ppc64le) \
-         ESUM='e3a467fcd088304c08a1c1c61f5ea2c065c10a312b01089d2eca9dd9611aab2c'; \
-         BINARY_URL='https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.3%2B9_openj9-0.44.0/ibm-semeru-open-jdk_ppc64le_linux_21.0.3_9_openj9-0.44.0.tar.gz'; \
+         BINARY_ARCH='ppc64le'; \
          ;; \
        s390x) \
-         ESUM='0135f03416588197334580c27f9a62f447fb3409907c6049008ce5fd2223520a'; \
-         BINARY_URL='https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.3%2B9_openj9-0.44.0/ibm-semeru-open-jdk_s390x_linux_21.0.3_9_openj9-0.44.0.tar.gz'; \
+         BINARY_ARCH='s390x'; \
          ;;\
        *) \
          echo "Unsupported arch: ${ARCH}"; \
          exit 1; \
          ;; \
     esac; \
+    BINARY_URL="https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-${JAVA_VERSION}/ibm-semeru-open-jdk_${BINARY_ARCH}_linux_${JAVA_VERSION}.tar.gz"; \
     curl -LfsSo /tmp/openjdk.tar.gz ${BINARY_URL}; \
-    echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; \
+    curl -LfsSo /tmp/openjdk.tar.gz.sha256 "${BINARY_URL}.sha256.txt"; \
+    echo "$(awk '{print $1}' /tmp/openjdk.tar.gz.sha256) */tmp/openjdk.tar.gz" | sha256sum -c -; \
     mkdir -p /opt/java/openjdk; \
     cd /opt/java/openjdk; \
     tar -xf /tmp/openjdk.tar.gz --strip-components=1; \
     mkdir -p /licenses; \
     cp /opt/java/openjdk/legal/java.base/LICENSE /licenses; \
     rm -rf /opt/java/openjdk/lib/src.zip; \
-    rm -rf /tmp/openjdk.tar.gz;
+    rm -rf /tmp/openjdk.tar.gz /tmp/openjdk.tar.gz.sha256;
 
 ENV JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:$PATH"
@@ -118,9 +118,10 @@ RUN set -eux; \
     "${INSTALL_PATH_TOMCAT}"/bin/shutdown.sh -force; \
     sleep 15; \
     FULL=$( (java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,printallStats 2>&1 || true) | awk '/^Cache is [0-9.]*% .*full/ {print substr($3, 1, length($3)-1)}'); \
-    DST_CACHE=$(java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,destroy 2>&1 || true); \
-    SCC_SIZE=$(echo $SCC_SIZE | sed 's/.$//'); \
-    SCC_SIZE=$(awk "BEGIN {print int($SCC_SIZE * $FULL / 100.0)}"); \
+    java -Xshareclasses:name=dry_run_scc,cacheDir=/opt/java/.scc,destroy 2>&1 || true; \
+    case "${FULL}" in ''|*[!0-9.]*|.*|*.*.*) echo "Unable to determine dry-run SCC usage: ${FULL}" >&2; exit 1 ;; esac; \
+    SCC_SIZE_MB="${SCC_SIZE%m}"; \
+    SCC_SIZE=$(awk "BEGIN {print int(${SCC_SIZE_MB} * ${FULL} / 100.0)}"); \
     [ "${SCC_SIZE}" -eq 0 ] && SCC_SIZE=1; \
     SCC_SIZE="${SCC_SIZE}m"; \
     java -Xshareclasses:name=openj9_system_scc,cacheDir=/opt/java/.scc,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version; \

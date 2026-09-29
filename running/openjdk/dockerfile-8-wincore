@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.502.0/ibm-semeru-open-jdk_x64_windows_8.0.502.0.msi
+ARG OPENJDK_URL=https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk-8.0.504.5/ibm-semeru-open-jdk_x64_windows_8.0.504.5.msi
 
 # Update Windows system root certificates before any Invoke-WebRequest calls.
 # servercore:ltsc2016 ships with outdated root certs (from 2016), missing modern roots like
