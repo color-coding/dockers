@@ -61,8 +61,8 @@ RUN $env:OPENJ9_JAVA_OPTIONS = '' ; \
     $SCC_SIZE = '64m' ; \
     $DOWNLOAD_PATH_TOMCAT = 'C:\temp\tomcat' ; \
     $INSTALL_PATH_TOMCAT = 'C:\tomcat-home' ; \
-    $TOMCAT_DWNLD_URL = 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.105/bin/apache-tomcat-9.0.105-windows-x64.zip' ; \
-    $TOMCAT_CHECKSUM = 'eea07407494f879dfd49f37ade1e5b6ce6b6c51b3a17cb48e676cbfb4f4a014ff94c6eb8a191978f6d8f80b297eb2736d93598dff7c69c89fd5427c3be6a3d4e' ; \
+    $TOMCAT_DWNLD_URL = 'https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.124/bin/apache-tomcat-9.0.124-windows-x64.zip' ; \
+    $TOMCAT_CHECKSUM = 'd7d37e9e2da57cd5ce70cba2d5ea620d5703862dc6265391925d859d209451bcec9e9cfb294bef363bb940a545d6317b268075075c0fac6e7253a98468c609fc' ; \
     \
     New-Item -ItemType Directory -Path $DOWNLOAD_PATH_TOMCAT -Force | Out-Null ; \
     New-Item -ItemType Directory -Path $INSTALL_PATH_TOMCAT -Force | Out-Null ; \
@@ -73,7 +73,7 @@ RUN $env:OPENJ9_JAVA_OPTIONS = '' ; \
     if ($hash -ne $TOMCAT_CHECKSUM.ToLower()) { Write-Host 'Verifying sha512 FAILED!'; exit 1 } ; \
     \
     Expand-Archive -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat.zip" -DestinationPath $DOWNLOAD_PATH_TOMCAT -Force ; \
-    Move-Item -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat-9.0.105-windows-x64\*" -Destination $INSTALL_PATH_TOMCAT -Force ; \
+    Move-Item -Path "$DOWNLOAD_PATH_TOMCAT\apache-tomcat-9.0.124\*" -Destination $INSTALL_PATH_TOMCAT -Force ; \
     Remove-Item -Path $DOWNLOAD_PATH_TOMCAT -Force -Recurse ; \
     \
     & java -Xshareclasses:name=dry_run_scc,cacheDir=C:\Windows\Temp\.scc\,bootClassesOnly,nonFatal,createLayer -Xscmx$SCC_SIZE -version ; \

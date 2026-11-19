@@ -1,4 +1,4 @@
-FROM accetto/ubuntu-vnc-xfce-firefox-g3:20.04
+FROM accetto/ubuntu-vnc-xfce-firefox-g3:22.04
 
 USER root
 
@@ -20,7 +20,8 @@ RUN printf '%s\n' \
     '# Search history entries matching the command prefix typed so far.' \
     '"\e[A": history-search-backward' \
     '"\e[B": history-search-forward' \
-    >> /etc/inputrc
+    >> /etc/inputrc \
+    && chmod 644 /etc/inputrc
 
 # 配置中文输入法：XFCE 会话启动 IBus，仅启用系统英文键盘和拼音
 RUN set -x \
